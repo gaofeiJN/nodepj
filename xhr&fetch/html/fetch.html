@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+
+<script>
+    console.log('---fetch-----------');
+    let promise = fetch('http://127.0.0.1:8080/');
+    console.log(promise);
+
+    promise
+        .then(function (res) {
+            return res.text();
+        })
+        .then(function (res) {
+            let newWindow = window.open();
+            newWindow.document.write(res);
+            console.log(res);
+        })
+    ;
+
+</script>
+</body>
+</html>

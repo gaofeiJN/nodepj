@@ -1,0 +1,64 @@
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>WEB Storage</title>
+</head>
+<body>
+<!--  -->
+<button id="cookie">cookie</button>
+<br>
+<button id="session">session</button>
+<br>
+<button id="local">local</button>
+<br>
+
+<!-- script -->
+<script>
+    // 取得服务器发送的cookie
+    // 1.服务器的响应没有设置Set-Cookie头的场合，document.cookie === blank
+    // 2.服务器的响应设置了Set-Cookie头的场合，document.cookie === Set-Cookie头
+    //   服务器端：userString = {"name":"gao fei","age":37,"city":"jinan"}
+    //           res.writeHead(200, {'Content-Type': 'text/html', 'Set-Cookie': `user01=${userString}`});
+    //   客户端端：document.cookie : user02={"name":"wang jinfei","age":18,"city":"taian"}
+    //                             // 第一次打印log时就有了！且在服务器设置的Set-Cookie前面！？？？？
+    //                             user01={"name":"gao fei","age":37,"city":"jinan"}
+    console.log(document.cookie);
+
+    // 设置cookie
+    //     name    : 必须用encodeUriComponent()编码
+    //     value   : 必须用encodeUriComponent()编码
+    //     expires : GMT格式的时间，表示cookie删除的日期
+    //     domain  : cookie的域，可以是某个子域（www.gaofei.com），也可以包含所有子域（gaofei.com）。只有域名，不包含协议名
+    //     path    : 路径
+    //     secure  : 指定了该字段，则只有在使用了SSL安全链接（https协议）的情况下，才会向服务器发送cookie
+    //     字段之间用分号加空格进行分割
+    let user02 = {
+        name: 'wang jinfei',
+        age: 18,
+        city: 'taian'
+    }
+    let userSting = JSON.stringify(user02);
+    let tomorrow = new Date('2/15/2025');
+    let dateString = tomorrow.toGMTString();
+    document.cookie = `user02=${userSting}; expires=${dateString}; domain=.localhost`;
+    //   客户端端：document.cookie : user01={"name":"gao fei","age":37,"city":"jinan"}； user02={"name":"wang jinfei","age":18,"city":"taian"}
+    console.log(document.cookie);
+
+    //
+    document.getElementById('cookie').addEventListener('click', function () {
+        window.open('http://localhost:8080/cookie/','_blank','');
+        console.log(document.cookie);
+    });
+
+    document.getElementById('session').addEventListener('click', function () {
+        window.open('http://localhost:8080/session/','_blank','');
+        console.log(document.cookie);
+    });
+
+    document.getElementById('local').addEventListener('click', function () {
+        window.open('http://localhost:8080/local/','_blank','');
+        console.log(document.cookie);
+    });
+</script>
+</body>
+</html>

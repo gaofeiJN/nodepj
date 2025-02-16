@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+<head>
+    <meta charset="UTF-8">
+    <title>Content Type练习</title>
+    <style>
+        .table {
+            display: table;
+        }
+
+        .row {
+            display: table-row;
+        }
+
+        .cell {
+            display: table-cell;
+        }
+
+        .label {
+            text-align: right;
+        }
+    </style>
+</head>
+<body>
+<form method="get" action="http://localhost:8080/types" target="_blank" id="form1">
+    <div class="table">
+        <div class="row">
+            <div class="cell label">Number1</div>
+            <div class="cell"><input type="number" name="num1" value="11"></div>
+        </div>
+
+        <div class="row">
+            <div class="cell label">Number2</div>
+            <div class="cell"><input type="number" name="num2" value="12"></div>
+        </div>
+
+        <div class="row">
+            <div class="cell label">Number3</div>
+            <div class="cell"><input type="number" name="num3" value="13"></div>
+        </div>
+
+        <div class="row">
+            <div class="cell label">File</div>
+            <div class="cell"><input type="file" name="file1"></div>
+        </div>
+    </div>
+    <button type="submit">Submit</button>
+    <button type="button" id="btn1">Arlen</button>
+    <button type="button" id="btn2">JSON</button>
+    <button type="button" id="btn3">FormData</button>
+    <div>
+        <p id="result"></p>
+    </div>
+</form>
+
+<script>
+    const btn1 = document.getElementById('btn1')
+    const btn2 = document.getElementById('btn2');
+    const btn3 = document.getElementById('btn3');
+    const result = document.getElementById('result');
+
+    btn1.onclick = sendURL;
+    btn2.onclick = sendJSON;
+    btn3.onclick = sendFormData;
+
+    let req;
+
+    function sendURL() {
+        let qs = "";
+        let elems = document.getElementsByTagName('input');
+        for (let i = 0; i < elems.length; i++) {
+            qs += elems[i].name + "=" + elems[i].value + '&';
+        }
+
+        console.log(qs);
+
+        req = new XMLHttpRequest();
+        req.onreadystatechange = handleResponse;
+
+        req.open('POST', 'http://localhost:8080/types');
+        req.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+        req.send(qs);
+    }
+
+    function sendJSON() {
+        let obj = {};
+        let elems = document.getElementsByTagName('input');
+        for (let i = 0; i < elems.length; i++) {
+            obj[elems[i].name] = elems[i].value;
+        }
+        console.log(obj);
+
+        req = new XMLHttpRequest();
+        req.onreadystatechange = handleResponse;
+
+        req.open('POST', 'http://localhost:8080/types');
+        req.setRequestHeader('Content-Type', 'application/json');
+        req.send(JSON.stringify(obj));
+    }
+
+    function sendFormData() {
+        let form = new FormData(document.getElementById('form1'));
+        console.log(form);
+
+        req = new XMLHttpRequest();
+        req.onreadystatechange = handleResponse;
+
+        req.open('POST', 'http://localhost:8080/types');
+        req.setRequestHeader('Content-Type', 'multipart/form-data');
+        req.send(form);
+    }
+
+    // 接受完整的html文档并在新页面打开
+    // function handleResponse() {
+    //
+    //     if (req.status === 200 && req.readyState === 4) {
+    //         // 后端返回的 HTML 格式数据
+    //         console.log('后端返回', req.responseText);
+    //
+    //         // 必须要存进localstorage，否则会报错，显示不完全
+    //         window.localStorage.removeItem('callbackHTML');
+    //         window.localStorage.setItem('callbackHTML', req.responseText);
+    //
+    //         // 读取本地保存的html数据，使用新窗口打开
+    //         let newWin = window.open('', '_blank');
+    //         newWin.document.write(localStorage.getItem('callbackHTML'));
+    //
+    //         // 关闭输出流
+    //         newWin.document.close();
+    //     }
+
+    // // 接受html片段
+    // function handleResponse() {
+    //
+    //     if (req.status === 200 && req.readyState === 4) {
+    //         result.innerHTML = req.responseText;
+    //     }
+    // }
+
+
+    // 接受JSON
+    function handleResponse() {
+
+        if (req.status === 200 && req.readyState === 4) {
+            let obj= JSON.parse(req.responseText);
+            result.innerHTML = "SUM = " + obj.sum;
+        }
+    }
+
+</script>
+</body>
+</html>

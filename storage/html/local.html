@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>local</title>
+</head>
+<body>
+<div>
+    <h1>local</h1>
+    <button id="add">add storage</button>
+</div>
+
+<script>
+    window.onload = function () {
+
+        // 为window添加storage事件
+        // ==> 没有触发事件？？？？
+        window.onstorage = function (e) {
+            console.log('---window on storage---');
+            console.log(`---  event: ---------`);
+            console.log(e);
+        }
+
+        //
+        localStorage.clear();
+        localStorage.setItem('key1', 'value1');
+        localStorage.setItem('key2', 'value2');
+        localStorage.setItem('key3', 'value3');
+        console.log(localStorage);
+
+        //使用for-in循环遍历Storage对象
+        for (let key in localStorage) {
+            console.log(`${key} = ${localStorage.getItem(key)}`);
+        }
+
+        //
+        let count = 0;
+        const addBtn = document.getElementById('add');
+        addBtn.addEventListener('click', function () {
+            localStorage.setItem(`gfkey${count}`, `gfvalue${count}`);
+            console.log(localStorage);
+            count++;
+        });
+    }
+</script>
+</body>
+</html>

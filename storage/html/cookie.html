@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Cookie</title>
+</head>
+<body>
+<div>
+    <h1>Cookie</h1>
+</div>
+
+<script>
+    console.log('---cookie-----');
+    console.log(document.cookie);       //
+
+    // 新设cookie
+    // name,value,domain,path,expires
+    let tomorrow = new Date("2/15/2025");
+    let expires = tomorrow.toGMTString();
+    console.log(expires);
+    document.cookie = `city=jinan; domain=.localhost; path=/; expires=${expires};`;
+    console.log(document.cookie);       //
+</script>
+</body>
+</html>

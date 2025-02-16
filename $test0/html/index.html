@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <style>
+        table,
+        th,
+        td {
+            border: 1px solid black;
+        }
+    </style>
+</head>
+
+<body>
+    <button>page1</button>
+    <button>page2</button>
+    <button>page3</button>
+    <button>page4</button>
+
+    <div id="result">
+        服务器返回内容
+    </div>
+
+    <table id="eventtbl">
+
+    </table>
+
+    <script>
+        const buttons = document.querySelectorAll('button');
+        console.log("hello world");
+
+
+        let res;
+
+        for (let i = 0; i < buttons.length; i++) {
+            buttons[i].addEventListener('click', function () {
+                clearEventDetails();
+
+                res = new XMLHttpRequest();
+
+                res.onreadystatechange = handleResponse;
+                res.onloadstart = handleLoadStart;
+                res.onprogress = handleProgress;
+                res.onload = handleLoad;
+                res.onloadend = handleLoadEnd;
+
+                res.open('GET', '/page' + i + '.html');
+                res.send();
+            });
+        }
+
+
+        function handleResponse() {
+            displayEventDetails("readystatechange: " + res.readyState);
+
+            if (res.status === 200 && res.readyState === 4) {
+                document.getElementById('result').innerHTML = res.responseText;
+            }
+
+        }
+
+        function handleLoadStart(e) {
+            displayEventDetails("loadstart ", e);
+        }
+
+        function handleProgress(e) {
+            displayEventDetails("progress ", e);
+        }
+
+        function handleLoadEnd(e) {
+            displayEventDetails("loadend ", e);
+        }
+
+        function handleLoad(e) {
+            displayEventDetails("load ", e);
+        }
+
+        function clearEventDetails() {
+            document.getElementById('eventtbl').innerHTML = '<tr><th>EventName</th><th>lengthComputable</th><th>loaded</th><th>total</th></tr>';
+        }
+
+        function displayEventDetails(eventName, e) {
+            if (e) {
+                document.getElementById('eventtbl').innerHTML += '<tr><td>' + eventName + '</td><td>' + e.lengthComputable + '</td><td>' + e.loaded + '</td><td>' + e.total + '</td></tr>';
+            } else {
+                document.getElementById('eventtbl').innerHTML += '<tr><td>' + eventName + '</td><td>NA</td><td>NA</td><td>NA</td></tr>';
+            }
+        }
+    </script>
+</body>
+
+</html>

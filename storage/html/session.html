@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>session</title>
+</head>
+<body>
+<div>
+    <h1>session</h1>
+</div>
+
+<script>
+    // Storage对象
+    console.log(localStorage);
+    console.log(sessionStorage);
+
+    //
+    localStorage.setItem('test1Name', 'test1Value');
+    localStorage.setItem('test2Name', 'test2Value');
+    console.log(localStorage.key(0));
+    console.log(localStorage.key(1));
+    console.log(localStorage.getItem('test1Name'));
+    console.log(localStorage.getItem('test2Name'));
+    console.log(localStorage.removeItem('test2Name'));
+    console.log(localStorage);
+    console.log(localStorage.clear());
+    console.log(localStorage);
+    localStorage.setItem('user01', '{"name":"user01","age":18}');
+    localStorage.setItem('user02', '{"name":"user02","age":36}');
+    console.log(localStorage);
+
+    //使用for-in循环遍历Storage对象
+    for (let key in localStorage) {
+        console.log(`${key} = ${localStorage.getItem(key)}`);
+    }
+</script>
+</body>
+</html>

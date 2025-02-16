@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+<script>
+    const xhr = new XMLHttpRequest();
+    console.log(xhr);
+
+    xhr.open('get', 'http://127.0.0.1:8080', true);
+    xhr.send();
+    console.log(xhr);
+
+    console.log('---Request----------');
+    let req = new Request('http://127.0.0.1:8080');
+    console.log(req);
+
+    console.log('---Headers----------');
+    let headers = new Headers();
+    headers.set('Content-Type', 'application/json');
+    console.log(headers);
+
+    console.log('---Response----------');
+    let response = new Response();
+    console.log(response);
+
+</script>
+</body>
+</html>
