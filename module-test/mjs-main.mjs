@@ -1,4 +1,4 @@
-import * as gf from './mjs.js';
+import * as gf from './mjs.mjs';
 
 console.log(gf);
 console.log(gf.name);

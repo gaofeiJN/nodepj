@@ -3,4 +3,4 @@ var getName=function(){
     return name;
 }
 
-export default {name,getName};
+export  { name,getName };

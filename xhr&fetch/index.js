@@ -10,7 +10,7 @@ const server = http.createServer((request, response) => {
             if (err) {
                 response.end(`Error: ${err}`);
             } else {
-                response.end(data);
+                response.end("Hello World!\n 2026.01.06");
             }
         })
     }
