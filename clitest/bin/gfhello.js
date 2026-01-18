@@ -20,10 +20,13 @@ const chalk = require("chalk");
 const spinner = ora().start();
 spinner.text = chalk.blue("Loading...");
 spinner.color = "yellow";
-spinner.spinner = "dots12";
+// spinner.spinner = "dots";
+// spinner.spinner = "line";
+// spinner.spinner = "circle";
+spinner.spinner = "growHorizontal";
 
 setTimeout(() => {
-  spinner.succeed("Loaded");
+  spinner.succeed(chalk.red("Loaded"));
 }, 5000);
 
 console.log(chalk.blue("This is a blue text"));
