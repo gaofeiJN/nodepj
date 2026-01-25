@@ -1,0 +1,7 @@
+::ffff:127.0.0.1 - - [24/Jan/2026:14:59:59 +0000] "GET /api HTTP/1.1" 404 142
+::ffff:127.0.0.1 - - [24/Jan/2026:15:00:24 +0000] "GET /api/user/ HTTP/1.1" 200 13
+::ffff:127.0.0.1 - - [24/Jan/2026:15:00:32 +0000] "GET /api/video/ HTTP/1.1" 200 14
+[0mGET /api/video/ [32m200[0m 5.304 ms - 14[0m
+[0mGET /api/video/create [33m404[0m 1.735 ms - 155[0m
+[0mGET /api/user [32m200[0m 0.705 ms - 13[0m
+::ffff:127.0.0.1 - - [24/Jan/2026:15:02:30 +0000] "GET /api/user HTTP/1.1" 200 13 "-" "PostmanRuntime/7.51.0"
