@@ -32,7 +32,7 @@ async function test() {
   //更新数据
   let updateResult = await col.updateMany(
     { name: "小五" },
-    { $set: { age: 3 } },
+    { $set: { age: 1.1 } },
   );
   console.log("更新结果:", updateResult);
 
@@ -43,6 +43,9 @@ async function test() {
   //查询数据 find()
   let findResult = await col.find({}).toArray();
   console.log("find结果:", findResult);
+
+  //关闭连接
+  await client.close();
 }
 
 test();
