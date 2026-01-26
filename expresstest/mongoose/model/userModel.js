@@ -10,8 +10,5 @@ const userSchema = new mongoose.Schema({
   phone: { type: String, required: true },
 });
 
-// 创建模型
-const User = mongoose.model("User", userSchema);
-
 // 导出模型
-module.exports = User;
+module.exports = userSchema;
