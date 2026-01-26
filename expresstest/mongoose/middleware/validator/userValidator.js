@@ -2,7 +2,7 @@ const { body } = require("express-validator");
 const validate = require("./errorBack");
 
 // 由valid check回调函数组成的数组
-const userValidator = validate([
+const userRegisterValidator = validate([
   body("name")
     .notEmpty()
     .withMessage("用户名不能为空")
@@ -26,4 +26,4 @@ const userValidator = validate([
     .withMessage("电话号码格式不正确"),
 ]);
 
-module.exports = userValidator;
+module.exports = { userRegisterValidator };
