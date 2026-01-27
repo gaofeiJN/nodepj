@@ -20,7 +20,7 @@ exports.createUser = async (req, res) => {
   try {
     await newUser.save();
     console.log(`User created : ${newUser}`);
-    res.status(201).send("User created");
+    res.status(201).json(newUser);
   } catch (error) {
     console.error("Error saving user:", error);
     return res.status(500).send("Error creating user");

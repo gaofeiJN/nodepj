@@ -13,7 +13,7 @@ const router = require("./router");
 
 // 中间件
 app.use(express.json());
-app.use(express.urlencoded());
+// app.use(express.urlencoded());
 
 // 跨域
 app.use(cors());
