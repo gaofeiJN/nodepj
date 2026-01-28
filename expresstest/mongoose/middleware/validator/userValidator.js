@@ -3,7 +3,7 @@ const validate = require("./errorBack");
 const { User } = require("../../model/index");
 
 // 由valid check回调函数组成的数组
-const userRegister = validate([
+const register = validate([
   body("name")
     .notEmpty()
     .withMessage("用户名不能为空")
@@ -55,5 +55,22 @@ const userRegister = validate([
     .bail(),
 ]);
 
-const userValidator = { userRegister };
+// 由valid check回调函数组成的数组
+const login = validate([
+  body("email")
+    .notEmpty()
+    .withMessage("电子邮件不能为空")
+    .bail()
+    .isEmail()
+    .withMessage("电子邮件格式不正确"),
+  body("password")
+    .notEmpty()
+    .withMessage("密码不能为空")
+    .bail()
+    .isLength({ min: 6 })
+    .withMessage("密码长度至少为6个字符")
+    .bail(),
+]);
+
+const userValidator = { register, login };
 module.exports = userValidator;
