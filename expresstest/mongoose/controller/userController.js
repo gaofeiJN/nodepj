@@ -1,5 +1,5 @@
 const { User } = require("../model/index");
-const bcrypt = require("bcrypt");
+const { createToken, verifyToken } = require("../util/jwt");
 
 // 注册新用户
 exports.register = async (req, res) => {
@@ -10,6 +10,7 @@ exports.register = async (req, res) => {
   try {
     await newUser.save();
     console.log(`User created : ${newUser}`);
+    // res.status(201).json(newUser.toJSON()); //res.json()方法会调用newUser.toJSON()
     res.status(201).json(newUser);
   } catch (error) {
     console.error("Error saving user:", error);
@@ -38,10 +39,16 @@ exports.login = async (req, res) => {
     // 登录成功，返回用户信息（不包含密码）
     // 如果在Schema中设置了set,这里对password进行赋值undefined会调用set的回调，
     // 导致报错 【Error: data and salt arguments required】
-    user.password = undefined; // 将password字段设为undefined
-
+    // user.password = undefined; // 将password字段设为undefined
+    let userJSON = user.toJSON(); // 调用toJSON方法
     console.log(`User logged in : ${user}`);
-    res.status(200).json(user);
+
+    // 生成token
+    let token = await createToken(userJSON);
+    userJSON.token = token;
+
+    // 返回给客户端
+    res.status(200).json(userJSON);
   } catch (error) {
     console.error("Error logging in user:", error);
     return res.status(500).send("Error logging in user");

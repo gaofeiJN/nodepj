@@ -1,6 +1,7 @@
 const { body } = require("express-validator");
 const validate = require("./errorBack");
 const { User } = require("../../model/index");
+const { set } = require("../../model/userSchema");
 
 // 由valid check回调函数组成的数组
 const register = validate([
@@ -13,39 +14,51 @@ const register = validate([
     .bail()
     .isLength({ min: 3, max: 30 })
     .withMessage("用户名长度必须在3到30个字符之间")
+    .bail()
     .custom(async (value) => {
-      const existingUser = await User.findOne({ name: value });
-      if (existingUser) {
-        return Promise.reject("用户名已被注册");
+      try {
+        const existingUser = await User.findOne({ name: value });
+        if (existingUser) {
+          return Promise.reject("用户名已被注册");
+        }
+      } catch (error) {
+        throw new Error("检查用户名时发生错误");
       }
-    })
-    .bail(),
+    }),
   body("email")
     .notEmpty()
     .withMessage("电子邮件不能为空")
     .bail()
     .isEmail()
     .withMessage("电子邮件格式不正确")
+    .bail()
     .custom(async (value) => {
-      const existingUser = await User.findOne({ email: value });
-      if (existingUser) {
-        return Promise.reject("邮箱已被注册");
+      try {
+        const existingUser = await User.findOne({ email: value });
+        if (existingUser) {
+          return Promise.reject("邮箱已被注册");
+        }
+      } catch (error) {
+        throw new Error("检查邮箱时发生错误");
       }
-    })
-    .bail(),
+    }),
   body("phone")
     .notEmpty()
     .withMessage("电话号码不能为空")
     .bail()
     .isNumeric()
     .withMessage("电话号码格式不正确")
+    .bail()
     .custom(async (value) => {
-      const existingUser = await User.findOne({ phone: value });
-      if (existingUser) {
-        return Promise.reject("电话号码已被注册");
+      try {
+        const existingUser = await User.findOne({ phone: value });
+        if (existingUser) {
+          return Promise.reject("电话号码已被注册");
+        }
+      } catch (error) {
+        throw new Error("检查电话号码时发生错误");
       }
-    })
-    .bail(),
+    }),
   body("password")
     .notEmpty()
     .withMessage("密码不能为空")
