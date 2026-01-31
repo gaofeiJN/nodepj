@@ -1,15 +1,14 @@
 const mongoose = require("mongoose");
 const userSchema = require("./userSchema");
 const videoSchema = require("./videoSchema");
-
-const util = require("util");
+const { MONGO_PATH } = require("../config");
 
 async function connectDB() {
   try {
-    await mongoose.connect("mongodb://localhost:27017/gftst");
-    console.log("Connected to MongoDB");
+    await mongoose.connect(MONGO_PATH);
+    console.log(`Connected to MongoDB : ${MONGO_PATH}`);
   } catch (error) {
-    console.error("Error connecting to MongoDB:", error);
+    console.error("Error connecting to MongoDB: ${MONGO_PATH} \n", error);
   }
 }
 

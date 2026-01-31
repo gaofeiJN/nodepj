@@ -3,13 +3,16 @@ const router = express.Router();
 
 const { userController } = require("../controller/index");
 const userValidator = require("../middleware/validator/userValidator");
+const { verifyToken } = require("../util/jwt");
 
-router.get("/", userController.listUsers).get("/:id", userController.getUser);
+router
+  .get("/", verifyToken, userController.listUsers)
+  .get("/:email", userController.getUser);
 
 router
   .post("/registers", userValidator.register, userController.register)
   .post("/logins", userValidator.login, userController.login)
-  .put("/:id", userController.updateUser)
-  .delete("/:id", userController.deleteUser);
+  .put("/:email", userController.updateUser)
+  .delete("/:email", userController.deleteUser);
 
 module.exports = router;
