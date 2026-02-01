@@ -51,6 +51,8 @@ const userSchema = new mongoose.Schema(
     age: { type: Number, required: false },
     city: { type: String, required: false },
     image: { type: String, default: null },
+    cover: { type: String, default: null },
+    channelDescription: { type: String, default: null },
     role: {
       type: String,
       enum: ["user", "admin", "moderator"],

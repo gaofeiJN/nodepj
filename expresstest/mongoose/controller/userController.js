@@ -100,3 +100,28 @@ exports.update = async (req, res) => {
 exports.deleteUser = async (req, res) => {
   console.log(`UserController -- deleteUser called`);
 };
+
+exports.avantar = async (req, res) => {
+  console.log(`UserController -- avantar called`);
+
+  // console.log(req.file);
+  // 更新用户的头像信息
+  let avantar = "avantars/" + req.file.filename;
+  try {
+    let newuser = await User.findByIdAndUpdate(
+      req.userInfo._id,
+      { image: avantar },
+      { new: true },
+    );
+    if (!newuser) {
+      return res.status(401).json({ error: "用户不存在" });
+    }
+
+    let userJSON = newuser.toJSON();
+    console.log(`用户头像更改成功 \n ${userJSON}`);
+    res.status(200).json({ avantar: userJSON.image });
+  } catch (error) {
+    console.log(error);
+    return res.status(501).json({ error: "用户头像更改失败" });
+  }
+};

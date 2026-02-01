@@ -1,10 +1,11 @@
 const express = require("express");
 const router = express.Router();
 
-const userRouter = require("./users");
-const videoRouter = require("./videos");
+const userRouter = require("./user");
+const videoRouter = require("./video");
 
-router.use("/users", userRouter);
-router.use("/videos", videoRouter);
+router.use(express.static("public"));
+router.use("/user", userRouter);
+router.use("/video", videoRouter);
 
 module.exports = router;
