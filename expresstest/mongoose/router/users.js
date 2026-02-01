@@ -12,7 +12,8 @@ router
 router
   .post("/registers", userValidator.register, userController.register)
   .post("/logins", userValidator.login, userController.login)
-  .put("/:email", userController.updateUser)
+  .put("/updates", verifyToken, userValidator.update, userController.update)
+  // .put("/:email", verifyToken, userController.update)
   .delete("/:email", userController.deleteUser);
 
 module.exports = router;

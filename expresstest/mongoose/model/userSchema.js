@@ -69,8 +69,6 @@ const userSchema = new mongoose.Schema(
       getters: true,
       transform: function (doc, ret) {
         // 删除不需要返回的字段
-        delete ret._id;
-        delete ret.__v;
         delete ret.password;
 
         // 格式化日期字段
@@ -90,8 +88,6 @@ const userSchema = new mongoose.Schema(
       getters: true,
       transform: function (doc, ret) {
         // 删除不需要返回的字段
-        delete ret._id;
-        delete ret.__v;
         delete ret.password;
 
         // 格式化日期字段

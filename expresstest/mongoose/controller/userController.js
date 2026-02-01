@@ -14,26 +14,38 @@ exports.register = async (req, res) => {
     res.status(201).json(newUser);
   } catch (error) {
     console.error("Error saving user:", error);
-    return res.status(500).send("Error creating user");
+    return res.status(500).json({ error: "Error creating user" });
   }
 };
 
 // 用户登录
 exports.login = async (req, res) => {
   console.log("UserController -- login called");
-  const { email, password } = req.body;
+  const { name, phone, email, password } = req.body;
+  var user = {};
+  console.log(name, phone, email, password);
 
   try {
-    // 【注】如果在Schema中将password字段设置为select: false，则需要在查询时显式选择它
-    const user = await User.findOne({ email }).select("+password");
+    if (name) {
+      // 【注】如果在Schema中将password字段设置为select: false，则需要在查询时显式选择它
+      user = await User.findOne({ name }).select("+password");
+    }
+    if (phone) {
+      // 【注】如果在Schema中将password字段设置为select: false，则需要在查询时显式选择它
+      user = await User.findOne({ phone }).select("+password");
+    }
+    if (email) {
+      // 【注】如果在Schema中将password字段设置为select: false，则需要在查询时显式选择它
+      user = await User.findOne({ email }).select("+password");
+    }
     if (!user) {
-      return res.status(404).send("未找到该用户");
+      return res.status(404).json({ error: "未找到该用户" });
     }
     console.log(user);
 
     // 比较密码
     if (!user.comparePasswordSync(password)) {
-      return res.status(401).send("密码错误");
+      return res.status(401).json({ error: "密码错误" });
     }
 
     // 登录成功，返回用户信息（不包含密码）
@@ -51,29 +63,40 @@ exports.login = async (req, res) => {
     res.status(200).json(userJSON);
   } catch (error) {
     console.error("Error logging in user:", error);
-    return res.status(500).send("Error logging in user");
+    return res.status(500).json({ error: "Error logging in user" });
   }
 };
 
 exports.listUsers = async (req, res) => {
   console.log("UserController -- listUsers called");
-  res.send("List of users");
 };
 
 exports.getUser = async (req, res) => {
-  const userId = req.params.id;
-  console.log(`UserController -- getUser called with ID: ${userId}`);
-  res.send(`User details for user ID: ${userId}`);
+  console.log(`UserController -- getUser called`);
 };
 
-exports.updateUser = async (req, res) => {
-  const userId = req.params.id;
-  console.log(`UserController -- updateUser called with ID: ${userId}`);
-  res.send(`User updated for user ID: ${userId}`);
+exports.update = async (req, res) => {
+  console.log(`UserController -- update called`);
+
+  try {
+    if (!req.userInfo || !req.userInfo._id) {
+      return res.status(400).json({ error: "Missing user id" });
+    }
+    let newuser = await User.findByIdAndUpdate(req.userInfo._id, req.body, {
+      new: true,
+      runValidators: true,
+    });
+    if (!newuser) {
+      return res.status(404).json({ error: "User not found" });
+    }
+    console.log(newuser);
+    res.status(200).json(newuser);
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json({ error: "Error updating user" });
+  }
 };
 
 exports.deleteUser = async (req, res) => {
-  const userId = req.params.id;
-  console.log(`UserController -- deleteUser called with ID: ${userId}`);
-  res.send(`User deleted for user ID: ${userId}`);
+  console.log(`UserController -- deleteUser called`);
 };
