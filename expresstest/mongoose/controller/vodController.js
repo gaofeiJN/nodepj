@@ -40,17 +40,15 @@ exports.createUploadVideo = async function (req, res, next) {
   }
 
   // 上传视频的信息
-  console.log("------------------------------------");
   const { title, filename } = req.body;
-  console.log(`title : ${title}; filename : ${filename}`);
+  // console.log(`title : ${title}; filename : ${filename}`);
 
   const alireq = new vod20170321.CreateUploadVideoRequest({
     title: title,
     fileName: filename,
   });
   let runtime = new Util.RuntimeOptions({});
-  console.log(util.inspect(alireq, true));
-  console.log("------------------------------------");
+  // console.log(util.inspect(alireq, true));
 
   try {
     const alires = await client.createUploadVideo(alireq);
