@@ -14,10 +14,10 @@ router
   .post("/registers", userValidator.register, userController.register)
   .post("/logins", userValidator.login, userController.login)
   .post(
-    "/avantars",
+    "/avatars",
     verifyToken,
-    upload.single("avantar"),
-    userController.avantar,
+    upload.single("avatar"),
+    userController.avatar,
   );
 
 router

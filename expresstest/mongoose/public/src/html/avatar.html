@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>用户头像管理</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .avatar-container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            padding: 40px;
+            width: 100%;
+            max-width: 500px;
+            text-align: center;
+        }
+
+        .avatar-title {
+            color: #333;
+            margin-bottom: 30px;
+            font-size: 28px;
+            font-weight: 600;
+        }
+
+        .avatar-preview {
+            width: 180px;
+            height: 180px;
+            border-radius: 50%;
+            margin: 0 auto 30px;
+            overflow: hidden;
+            border: 5px solid #e0e0e0;
+            position: relative;
+            background: #f5f5f5;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .avatar-preview:hover {
+            border-color: #667eea;
+            transform: scale(1.05);
+        }
+
+        .avatar-preview img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .avatar-placeholder {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            height: 100%;
+            color: #999;
+        }
+
+        .avatar-placeholder i {
+            font-size: 48px;
+            margin-bottom: 10px;
+        }
+
+        .avatar-upload-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 14px 32px;
+            border-radius: 50px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            margin: 10px;
+        }
+
+        .avatar-upload-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+        }
+
+        .avatar-upload-btn:active {
+            transform: translateY(0);
+        }
+
+        .avatar-upload-btn i {
+            font-size: 20px;
+        }
+
+        .btn-group {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            flex-wrap: wrap;
+            margin-top: 20px;
+        }
+
+        .avatar-delete-btn {
+            background: #ff4757;
+            color: white;
+            border: none;
+            padding: 12px 28px;
+            border-radius: 50px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .avatar-delete-btn:hover {
+            background: #ff3742;
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(255, 71, 87, 0.3);
+        }
+
+        .avatar-reset-btn {
+            background: #f1f2f6;
+            color: #333;
+            border: 2px solid #ddd;
+            padding: 12px 28px;
+            border-radius: 50px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .avatar-reset-btn:hover {
+            background: #e4e5e9;
+            transform: translateY(-2px);
+        }
+
+        .file-input {
+            display: none;
+        }
+
+        .avatar-info {
+            margin-top: 25px;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 10px;
+            text-align: left;
+        }
+
+        .avatar-info h3 {
+            color: #333;
+            margin-bottom: 10px;
+            font-size: 16px;
+        }
+
+        .avatar-info ul {
+            list-style: none;
+            color: #666;
+            font-size: 14px;
+            line-height: 1.6;
+        }
+
+        .avatar-info li {
+            margin-bottom: 6px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .avatar-info li:before {
+            content: "✓";
+            color: #4CAF50;
+            font-weight: bold;
+        }
+
+        .progress-container {
+            width: 100%;
+            height: 6px;
+            background: #f0f0f0;
+            border-radius: 3px;
+            margin: 20px 0;
+            overflow: hidden;
+            display: none;
+        }
+
+        .progress-bar {
+            height: 100%;
+            background: linear-gradient(90deg, #667eea, #764ba2);
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+
+        .message {
+            padding: 12px 20px;
+            border-radius: 8px;
+            margin: 15px 0;
+            font-size: 14px;
+            display: none;
+        }
+
+        .message.success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .message.error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        .message.info {
+            background: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #bee5eb;
+        }
+
+        .avatar-actions {
+            margin-top: 30px;
+        }
+
+        .crop-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .crop-content {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            width: 90%;
+            max-width: 500px;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        .crop-area {
+            width: 100%;
+            height: 300px;
+            background: #f0f0f0;
+            margin: 20px 0;
+            overflow: hidden;
+        }
+
+        .crop-preview {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            overflow: hidden;
+            margin: 20px auto;
+            border: 3px solid #667eea;
+        }
+
+        .modal-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        @media (max-width: 600px) {
+            .avatar-container {
+                padding: 25px;
+            }
+            
+            .btn-group {
+                flex-direction: column;
+            }
+            
+            .avatar-preview {
+                width: 150px;
+                height: 150px;
+            }
+        }
+    </style>
+    <!-- 使用 Font Awesome 图标 -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <div class="avatar-container">
+        <h1 class="avatar-title">更改用户头像</h1>
+        
+        <!-- 头像预览区域 -->
+        <div class="avatar-preview" id="avatarPreview">
+            <div class="avatar-placeholder">
+                <i class="fas fa-user-circle"></i>
+                <span>点击上传头像</span>
+            </div>
+            <!-- 图片将在上传后动态添加 -->
+        </div>
+
+        <!-- 上传按钮 -->
+        <button class="avatar-upload-btn" id="uploadBtn">
+            <i class="fas fa-upload"></i>
+            选择图片
+        </button>
+
+        <!-- 隐藏的文件输入 -->
+        <input type="file" 
+               id="avatarInput" 
+               class="file-input" 
+               accept="image/*"
+               capture="user">
+
+        <!-- 上传进度条 -->
+        <div class="progress-container" id="progressContainer">
+            <div class="progress-bar" id="progressBar"></div>
+        </div>
+
+        <!-- 消息提示 -->
+        <div class="message" id="message"></div>
+
+        <!-- 按钮组 -->
+        <div class="btn-group">
+            <button class="avatar-delete-btn" id="deleteBtn">
+                <i class="fas fa-trash-alt"></i>
+                删除头像
+            </button>
+            <button class="avatar-reset-btn" id="resetBtn">
+                <i class="fas fa-redo"></i>
+                重置为默认
+            </button>
+        </div>
+
+        <!-- 头像信息 -->
+        <div class="avatar-info">
+            <h3>上传要求：</h3>
+            <ul>
+                <li>支持格式：JPG、PNG、GIF、WebP</li>
+                <li>最大文件大小：5MB</li>
+                <li>推荐尺寸：200×200像素以上</li>
+                <li>建议使用正方形图片</li>
+            </ul>
+        </div>
+
+        <!-- 裁剪模态框 -->
+        <div class="crop-modal" id="cropModal">
+            <div class="crop-content">
+                <h2>裁剪头像</h2>
+                <p>调整图片位置和大小</p>
+                <div class="crop-area" id="cropArea"></div>
+                <div class="crop-preview" id="cropPreview"></div>
+                <div class="modal-buttons">
+                    <button class="avatar-upload-btn" id="confirmCrop">确认裁剪</button>
+                    <button class="avatar-reset-btn" id="cancelCrop">取消</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="../script/avatar.js"></script>
+</body>
+</html>

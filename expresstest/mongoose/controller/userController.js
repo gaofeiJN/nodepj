@@ -101,16 +101,16 @@ exports.deleteUser = async (req, res) => {
   console.log(`UserController -- deleteUser called`);
 };
 
-exports.avantar = async (req, res) => {
-  console.log(`UserController -- avantar called`);
+exports.avatar = async (req, res) => {
+  console.log(`UserController -- avatar called`);
 
   // console.log(req.file);
   // 更新用户的头像信息
-  let avantar = "avantars/" + req.file.filename;
+  let avatar = "avatars/" + req.file.filename;
   try {
     let newuser = await User.findByIdAndUpdate(
       req.userInfo._id,
-      { image: avantar },
+      { image: avatar },
       { new: true },
     );
     if (!newuser) {
@@ -119,7 +119,7 @@ exports.avantar = async (req, res) => {
 
     let userJSON = newuser.toJSON();
     console.log(`用户头像更改成功 \n ${userJSON}`);
-    res.status(200).json({ avantar: userJSON.image });
+    res.status(200).json({ avatar: userJSON.image });
   } catch (error) {
     console.log(error);
     return res.status(501).json({ error: "用户头像更改失败" });

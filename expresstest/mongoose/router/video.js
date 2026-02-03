@@ -1,8 +1,16 @@
 const express = require("express");
 const router = express.Router();
 
-const { videoController } = require("../controller/index");
+const { verifyToken } = require("../util/jwt");
+const { videoController, vodController } = require("../controller/index");
 
-router.get("/", videoController.listVideos);
+router
+  .get("/", verifyToken, videoController.listVideos)
+  .post(
+    "/getvod",
+    verifyToken,
+    vodController.createUploadVideo,
+    videoController.getvod,
+  );
 
 module.exports = router;

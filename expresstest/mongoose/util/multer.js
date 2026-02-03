@@ -1,20 +1,19 @@
 const multer = require("multer");
 const path = require("path");
-const fs = require("fs");
 
 // 配置multer
 
 // 配置multer存储引擎
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
-    cb(null, "public/avantars/");
+    cb(null, "public/avatars/");
   },
   filename: function (req, file, cb) {
     // 生成唯一文件名
     const suffix = Date.now() + "-" + Math.round(Math.random() * 1e9);
-    const extname = path.extname(file.originalname);
+    const extname = path.extname(file.originalname); // 扩展名
     const baseName = path.basename(file.originalname, extname);
-    cb(null, `${baseName}-${suffix}${extname}`);
+    cb(null, `${baseName}-${suffix}${extname}`); // suffix和extname中间没有"."
   },
 });
 
