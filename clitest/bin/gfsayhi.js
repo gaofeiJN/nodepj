@@ -1,12 +1,12 @@
 #! /usr/bin/env node
-const {program}=require('commander');
+const { program } = require("commander");
 
 console.log("hi,tao tao~");
 
 // commander
-program.option('-t --taotao',"淘淘小帅哥");
-program.option('-l --livelove',"二刺猿赛高");
-program.option('-m --money',"钱越多越好");
+program.option("-t --taotao", "淘淘小帅哥");
+program.option("-l --livelove", "二刺猿赛高");
+program.option("-m --money", "钱越多越好");
 
 // gfsayhi -h
 //
@@ -19,14 +19,14 @@ program.option('-m --money',"钱越多越好");
 //     -h, --help     display help for command
 
 program
-    .command('sayhello <name> [other...]')
-    .alias('echo')              // 别名
-    .option('-c --city')
-    .description('说点什么')
-    .action(function(name,other){
-        console.log(name + '，你好啊~');
-        console.log(other);
-    });
+  .command("sayhello <name> [other...]")
+  .alias("echo") // 别名
+  .option("-c --city")
+  .description("说点什么")
+  .action(function (name, other) {
+    console.log(name + "，你好啊~");
+    console.log(other);
+  });
 
 program.parse(process.argv);
 
