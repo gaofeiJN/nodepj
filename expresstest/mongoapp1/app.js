@@ -22,7 +22,7 @@ async function test() {
   // console.log(collections);
   // console.log(users);
   // console.log(util.inspect(mongodb.Db.prototype,true,null,true));
-  console.log(util.inspect(mongodb.Collection.prototype,true,null,true));
+  // console.log(util.inspect(mongodb.Collection.prototype,true,null,true));
 
   // //插入数据
   // let insertResult = await col.insertMany([
@@ -46,9 +46,10 @@ async function test() {
   // let findOneResult = await col.findOne({ name: "六一" });
   // console.log("findOne结果:", findOneResult);
 
-  // //查询数据 find()
-  // let findResult = await col.find({}).toArray();
-  // console.log("find结果:", findResult);
+  //查询数据 find()
+  let findResult = await users.find({}).toArray(); // find结果：document的数组
+  // let findResult = await users.find({}); // find结果: FindCursor
+  console.log("find结果:", findResult);
 
   //关闭连接
   await client.close();

@@ -34,13 +34,15 @@ try {
   client = null;
 }
 
-exports.createUploadVideo = async function (req, res, next) {
+exports.CreateUploadVideo = async function (req, res, next) {
+  console.log(req.query);
+
   if (!client) {
     return res.status(500).json({ error: "无法连接到阿里云点播服务器" });
   }
 
   // 上传视频的信息
-  const { title, filename } = req.body;
+  const { title, filename } = req.query;
   // console.log(`title : ${title}; filename : ${filename}`);
 
   const alireq = new vod20170321.CreateUploadVideoRequest({
@@ -64,5 +66,41 @@ exports.createUploadVideo = async function (req, res, next) {
     console.log(error);
     // API返回
     return res.status(500).json({ error: "无法从阿里云点播获得上传权限" });
+  }
+};
+
+exports.RefreshUploadVideo = async function (req, res, next) {
+  console.log(req.query);
+
+  if (!client) {
+    return res.status(500).json({ error: "无法连接到阿里云点播服务器" });
+  }
+
+  // 上传视频的信息
+  const { title, filename, videoId } = req.query;
+  // console.log(`title : ${title}; filename : ${filename}`);
+
+  const alireq = new vod20170321.RefreshUploadVideoRequest({
+    title: title,
+    fileName: filename,
+    videoId: videoId,
+  });
+  let runtime = new Util.RuntimeOptions({});
+  // console.log(util.inspect(alireq, true));
+
+  try {
+    const alires = await client.refreshUploadVideo(alireq);
+    // const alires = await client.refreshUploadVideoWithOptions(
+    //   alireq,
+    //   runtime,
+    // );
+    req.alires = alires;
+    console.log(JSON.stringify(alires, null, 1));
+    next();
+  } catch (error) {
+    // 错误 message
+    console.log(error);
+    // API返回
+    return res.status(500).json({ error: "无法从阿里云点播刷新上传权限" });
   }
 };

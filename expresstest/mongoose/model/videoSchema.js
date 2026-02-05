@@ -1,14 +1,58 @@
 const mongoose = require("mongoose");
 
 // 定义Schema
-const videoSchema = new mongoose.Schema({
-  name: { type: String, required: true },
-  age: { type: Number, required: false },
-  city: { type: String, required: false },
-  email: { type: String, required: true },
-  password: { type: String, required: true },
-  phone: { type: String, required: true },
-});
+const videoSchema = new mongoose.Schema(
+  {
+    title: { type: String, required: true },
+    fileName: { type: String, required: true },
+    description: { type: String, required: false },
+    videoId: { type: String, required: true, unique: true },
+    userId: { type: mongoose.ObjectId, required: true, ref: "User" },
+  },
+  {
+    timestamps: true,
+    toJSON: {
+      virtuals: true,
+      getters: true,
+      transform: function (doc, ret) {
+        // 删除不需要返回的字段
+
+        // 格式化日期字段
+        if (ret.createdAt) {
+          ret.createdAt = ret.createdAt.toISOString();
+        }
+        if (ret.updatedAt) {
+          ret.updatedAt = ret.updatedAt.toISOString();
+        }
+
+        // 返回修改后的对象
+        return ret;
+      },
+    },
+    toObject: {
+      virtuals: true,
+      getters: true,
+      transform: function (doc, ret) {
+        // 删除不需要返回的字段
+
+        // 格式化日期字段
+        if (ret.createdAt) {
+          ret.createdAt = ret.createdAt.toISOString();
+        }
+        if (ret.updatedAt) {
+          ret.updatedAt = ret.updatedAt.toISOString();
+        }
+
+        // 返回修改后的对象
+        return ret;
+      },
+    },
+  },
+);
+
+// index
+videoSchema.index({ createdAt: -1 });
+videoSchema.index({ updatedAt: -1 });
 
 // 导出模型
 module.exports = videoSchema;

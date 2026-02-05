@@ -12,9 +12,11 @@ async function connectDB() {
       age: Number,
       city: String,
     });
-    mongoose.connection.model("User", userSchema);
-    console.log(util.inspect(mongoose.connection.models, true, 5, true));
+    const User = mongoose.connection.model("User", userSchema);
+    const userlist = await User.find();
+    console.log(userlist); // 打印结果：document的数组
     // console.log(mongoose.Connection.prototype);
+    // console.log(util.inspect(mongoose.connection.models, true, 5, true));
   } catch (error) {
     console.error("Error connecting to MongoDB:", error);
   }

@@ -2,7 +2,7 @@ const express = require("express");
 const router = express.Router();
 
 const { userController } = require("../controller/index");
-const userValidator = require("../middleware/validator/userValidator");
+const { userValidator } = require("../middleware/validator/index");
 const { verifyToken } = require("../util/jwt");
 const upload = require("../util/multer");
 

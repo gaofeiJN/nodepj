@@ -1,7 +1,6 @@
 const { body } = require("express-validator");
 const validate = require("./errorBack");
 const { User } = require("../../model/index");
-const { set } = require("../../model/userSchema");
 
 // 由valid check回调函数组成的数组
 const register = validate([
@@ -23,7 +22,7 @@ const register = validate([
         }
         return true;
       } catch (error) {
-        throw new Error("检查用户名时发生错误");
+        throw error;
       }
     }),
   body("email")
@@ -41,7 +40,7 @@ const register = validate([
         }
         return true;
       } catch (error) {
-        throw new Error("检查邮箱时发生错误");
+        throw error;
       }
     }),
   body("phone")
@@ -59,7 +58,7 @@ const register = validate([
         }
         return true;
       } catch (error) {
-        throw new Error("检查电话号码时发生错误");
+        throw error;
       }
     }),
   body("password")
@@ -89,7 +88,7 @@ const login = validate([
         }
         return true;
       } catch (error) {
-        throw new Error("检查用户名时发生错误");
+        throw error;
       }
     }),
   body("email")
@@ -105,7 +104,7 @@ const login = validate([
         }
         return true;
       } catch (error) {
-        throw new Error("检查邮箱时发生错误");
+        throw error;
       }
     }),
   body("phone")
@@ -121,7 +120,7 @@ const login = validate([
         }
         return true;
       } catch (error) {
-        throw new Error("检查电话号码时发生错误");
+        throw error;
       }
     }),
   body("password")
@@ -161,7 +160,7 @@ const update = validate([
         }
         return true;
       } catch (error) {
-        throw new Error("检查用户名时发生错误");
+        throw error;
       }
     }),
   body("email")
@@ -180,7 +179,7 @@ const update = validate([
         }
         return true;
       } catch (error) {
-        throw new Error("检查邮箱时发生错误");
+        throw error;
       }
     }),
   body("phone")
@@ -199,7 +198,7 @@ const update = validate([
         }
         return true;
       } catch (error) {
-        throw new Error("检查电话号码时发生错误");
+        throw error;
       }
     }),
   body("password")
