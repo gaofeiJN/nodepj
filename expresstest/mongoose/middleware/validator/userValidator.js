@@ -1,4 +1,4 @@
-const { body } = require("express-validator");
+const { body, param } = require("express-validator");
 const validate = require("./errorBack");
 const { User } = require("../../model/index");
 
@@ -211,5 +211,10 @@ const update = validate([
     .bail(),
 ]);
 
-const userValidator = { register, login, update };
+// 由valid check回调函数组成的数组
+const subscribe = validate([
+  param("channelId").notEmpty().withMessage("频道id不能为空").bail(),
+]);
+
+const userValidator = { register, login, update, subscribe };
 module.exports = userValidator;

@@ -12,25 +12,32 @@ exports.createToken = async function (userInfo) {
   return await sign(userInfo, JWT_SECRET, { expiresIn: 60 * 60 * 24 });
 };
 
-// 验证token的方法做成中间件
+// 验证token的方法做成中间件工厂函数，通过向函数传递参数，从而控制中间件的行为
 // token在请求头的autorization字段里面 { authorization : "Bearer " + token }
-exports.verifyToken = async function (req, res, next) {
-  // 1.请求头中没有Authorization : null
-  // 2.请求头中有Authorization，但不是Bearer模式 ： ''
-  // 3.请求头中有Authorization，且为Bearer模式 ： token
-  let token = req.headers.authorization;
-  token = token ? token.split("Bearer ")[1] : null;
-  if (!token) {
-    res.status(402).json({ error: "请传入token" });
-  }
-  try {
-    req.userInfo = await verify(token, JWT_SECRET);
-    console.log(`req.userInfo : \n ${util.inspect(req.userInfo)}`);
+exports.verifyToken = function (verificationRequired = true) {
+  return async function (req, res, next) {
+    // 1.请求头中没有Authorization : null
+    // 2.请求头中有Authorization，但不是Bearer模式 ： ''
+    // 3.请求头中有Authorization，且为Bearer模式 ： token
+    let token = req.headers.authorization;
+    token = token ? token.split("Bearer ")[1] : null;
+    if (token) {
+      try {
+        req.userInfo = await verify(token, JWT_SECRET);
+        console.log(`req.userInfo : \n ${util.inspect(req.userInfo)}`);
 
-    next();
-  } catch (e) {
-    res.status(402).json({ error: "无效的token" });
-  }
+        next();
+      } catch (e) {
+        return res.status(402).json({ error: "无效的token" });
+      }
+    } else {
+      if (verificationRequired) {
+        return res.status(402).json({ error: "请传入token" });
+      } else {
+        next();
+      }
+    }
+  };
 };
 
 // var user = {

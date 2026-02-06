@@ -1,5 +1,23 @@
 const { Video } = require("../model/index");
 
+// 查找指定视频
+exports.video = async (req, res) => {
+  console.log("videoController -- video called");
+  console.log(req.params);
+
+  try {
+    const video = await Video.findById(req.params.id).populate(
+      "userId",
+      "_id name image",
+    );
+    console.log(video);
+    res.status(200).json(video);
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ error: "错误：查询不到视频信息" });
+  }
+};
+
 // 查找所有视频
 exports.videoListAll = async (req, res) => {
   console.log("videoController -- videoListAll called");
@@ -24,7 +42,7 @@ exports.videoList = async (req, res) => {
       .skip((pageNum - 1) * pageSize)
       .limit(pageSize)
       .sort({ createdAt: -1 })
-      .populate("userId"); // userId作为外键进行关联查询
+      .populate("userId", "_id name image"); // userId作为外键进行关联查询
     console.log(videoList);
     res.status(200).json(videoList);
   } catch (error) {

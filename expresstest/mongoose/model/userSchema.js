@@ -52,7 +52,14 @@ const userSchema = new mongoose.Schema(
     city: { type: String, required: false },
     image: { type: String, default: null },
     cover: { type: String, default: null },
+    channelId: {
+      type: mongoose.ObjectId,
+      set: function (value) {
+        return this._id;
+      },
+    },
     channelDescription: { type: String, default: null },
+    subscribeCount: { type: Number, default: 0 },
     role: {
       type: String,
       enum: ["user", "admin", "moderator"],

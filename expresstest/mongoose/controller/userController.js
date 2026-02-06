@@ -1,5 +1,5 @@
-const { User } = require("../model/index");
-const { createToken, verifyToken } = require("../util/jwt");
+const { User, Subscribe } = require("../model/index");
+const { createToken } = require("../util/jwt");
 
 // 注册新用户
 exports.register = async (req, res) => {
@@ -123,5 +123,81 @@ exports.avatar = async (req, res) => {
   } catch (error) {
     console.log(error);
     return res.status(501).json({ error: "用户头像更改失败" });
+  }
+};
+
+exports.subscribe = async (req, res) => {
+  console.log(`UserController -- subscribe called`);
+
+  const userId = req.userInfo.id;
+  const channelId = req.params.channelId;
+
+  // 检查userId与channelId是否相等
+  if (userId === channelId) {
+    return res.status(401).json({ error: "不能关注自己" });
+  }
+
+  // 检查是否已关注频道
+  try {
+    const subscribed = await Subscribe.findOne({ userId, channelId });
+    if (subscribed) {
+      return res.status(401).json({ error: "已关注此频道" });
+    }
+  } catch (error) {
+    console.log(error);
+    return res
+      .status(501)
+      .json({ error: "错误：无法从数据库获取关注频道的信息" });
+  }
+
+  // 订阅频道入库
+  let newSubscribe = new Subscribe({ userId, channelId });
+  try {
+    let dbback = await newSubscribe.save();
+    console.log(dbback);
+
+    let user = await User.findById(channelId);
+    user.subscribeCount++;
+    user = await user.save();
+    console.log(user);
+
+    res.status(200).json({ msg: "订阅成功" });
+  } catch (error) {
+    console.log(error);
+    return res.status(501).json({ error: "订阅失败" });
+  }
+};
+
+exports.unsubscribe = async (req, res) => {
+  console.log(`UserController -- unsubscribe called`);
+
+  const userId = req.userInfo.id;
+  const channelId = req.params.channelId;
+
+  // 检查userId与channelId是否相等
+  if (userId === channelId) {
+    return res.status(401).json({ error: "不能取消关注自己" });
+  }
+
+  // 检查是否已关注频道
+  try {
+    const subscribed = await Subscribe.findOne({ userId, channelId });
+    if (!subscribed) {
+      return res.status(401).json({ error: "不能取消未关注的频道" });
+    } else {
+      // 取消订阅频道入库
+      let dbback = await subscribed.deleteOne();
+      console.log(dbback);
+
+      let user = await User.findById(channelId);
+      user.subscribeCount--;
+      user = await user.save();
+      console.log(user);
+
+      res.status(200).json({ msg: "取消订阅成功" });
+    }
+  } catch (error) {
+    console.log(error);
+    return res.status(501).json({ error: "访问数据库时发生错误" });
   }
 };

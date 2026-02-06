@@ -6,29 +6,30 @@ const { videoValidator } = require("../middleware/validator/index");
 const { videoController, vodController } = require("../controller/index");
 
 router
-  .get("/listAll", verifyToken, videoController.videoListAll)
+  .get("/video/:id", verifyToken(false), videoController.video)
+  .get("/listAll", verifyToken(false), videoController.videoListAll)
   .get(
     "/list",
-    verifyToken,
+    verifyToken(false),
     videoValidator.videoList,
     videoController.videoList,
   )
   .get(
     "/CreateUploadVideo",
-    verifyToken,
+    verifyToken(),
     vodController.CreateUploadVideo,
     videoController.CreateUploadVideo,
   )
   .get(
     "/RefreshUploadVideo",
-    verifyToken,
+    verifyToken(),
     vodController.RefreshUploadVideo,
     videoController.RefreshUploadVideo,
   );
 
 router.post(
   "/creations",
-  verifyToken,
+  verifyToken(),
   videoValidator.createVideo,
   videoController.createVideo,
 );
