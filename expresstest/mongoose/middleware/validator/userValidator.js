@@ -3,7 +3,7 @@ const validate = require("./errorBack");
 const { User } = require("../../model/index");
 
 // 由valid check回调函数组成的数组
-const register = validate([
+exports.postRegisterValidate = validate([
   body("name")
     .notEmpty()
     .withMessage("用户名不能为空")
@@ -71,7 +71,7 @@ const register = validate([
 ]);
 
 // 由valid check回调函数组成的数组
-const login = validate([
+exports.postLoginValidate = validate([
   body("name")
     .optional()
     .isString()
@@ -140,7 +140,7 @@ const login = validate([
 ]);
 
 // 由valid check回调函数组成的数组
-const update = validate([
+exports.putUpdateValidate = validate([
   body("name")
     .optional()
     .notEmpty()
@@ -212,9 +212,51 @@ const update = validate([
 ]);
 
 // 由valid check回调函数组成的数组
-const subscribe = validate([
+exports.getSubscribeValidate = validate([
   param("channelId").notEmpty().withMessage("频道id不能为空").bail(),
 ]);
 
-const userValidator = { register, login, update, subscribe };
-module.exports = userValidator;
+// 由valid check回调函数组成的数组
+exports.getUnsubscribeValidate = validate([
+  param("channelId").notEmpty().withMessage("频道id不能为空").bail(),
+]);
+
+// 由valid check回调函数组成的数组
+exports.getFollowValidate = validate([
+  param("userId")
+    .notEmpty()
+    .withMessage("userId不能为空")
+    .bail()
+    .custom(async function (userId) {
+      try {
+        let user = await User.findById(userId);
+        if (!user) {
+          throw new Error("用户不存在");
+        }
+        return true;
+      } catch (error) {
+        console.log(error);
+        throw error;
+      }
+    }),
+]);
+
+// 由valid check回调函数组成的数组
+exports.getFansValidate = validate([
+  param("userId")
+    .notEmpty()
+    .withMessage("userId不能为空")
+    .bail()
+    .custom(async function (userId) {
+      try {
+        let user = await User.findById(userId);
+        if (!user) {
+          throw new Error("用户不存在");
+        }
+        return true;
+      } catch (error) {
+        console.log(error);
+        throw error;
+      }
+    }),
+]);

@@ -7,34 +7,57 @@ const { verifyToken } = require("../util/jwt");
 const upload = require("../util/multer");
 
 router
-  .get("/", verifyToken(), userController.listUsers)
-  .get("/:email", userController.getUser)
+  .get("/userlist", verifyToken(), userController.getUserList)
+  .get("/:userId/userinfo", userController.getUserInfo)
   .get(
-    "/subscribe/:channelId",
+    "/:channelId/subscribe",
     verifyToken(),
-    userValidator.subscribe,
-    userController.subscribe,
+    userValidator.getSubscribeValidate,
+    userController.getSubscribe,
   )
   .get(
-    "/unsubscribe/:channelId",
+    "/:channelId/unsubscribe",
     verifyToken(),
-    userValidator.subscribe,
-    userController.unsubscribe,
+    userValidator.getUnsubscribeValidate,
+    userController.getUnsubscribe,
+  )
+  .get(
+    "/:userId/follow",
+    verifyToken(),
+    userValidator.getFollowValidate,
+    userController.getFollow,
+  )
+  .get(
+    "/:userId/fans",
+    verifyToken(),
+    userValidator.getFansValidate,
+    userController.getFans,
   );
 
 router
-  .post("/registers", userValidator.register, userController.register)
-  .post("/logins", userValidator.login, userController.login)
   .post(
-    "/avatars",
+    "/register",
+    userValidator.postRegisterValidate,
+    userController.postRegister,
+  )
+  .post(
+    "/login", 
+    userValidator.postLoginValidate, 
+    userController.postLogin)
+  .post(
+    "/avatar",
     verifyToken(),
     upload.single("avatar"),
-    userController.avatar,
+    userController.postAvatar,
   );
 
 router
-  .put("/updates", verifyToken(), userValidator.update, userController.update)
-  // .put("/:email", verifyToken(), userController.update)
-  .delete("/:email", userController.deleteUser);
+  .put(
+    "/:userId/update",
+    verifyToken(),
+    userValidator.putUpdateValidate,
+    userController.putUpdate,
+  )
+  .delete("/:userId", userController.deleteUser);
 
 module.exports = router;

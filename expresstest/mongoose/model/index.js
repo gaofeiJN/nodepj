@@ -1,7 +1,9 @@
 const mongoose = require("mongoose");
+
 const userSchema = require("./userSchema");
 const videoSchema = require("./videoSchema");
 const subscribeSchema = require("./subscribeSchema");
+const commentSchema = require("./commentSchema");
 const { MONGO_PATH } = require("../config");
 
 async function connectDB() {
@@ -19,4 +21,5 @@ module.exports = {
   User: mongoose.model("User", userSchema),
   Video: mongoose.model("Video", videoSchema),
   Subscribe: mongoose.model("Subscribe", subscribeSchema),
+  Comment: mongoose.model("Comment", commentSchema),
 };

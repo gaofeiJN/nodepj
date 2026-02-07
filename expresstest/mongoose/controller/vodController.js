@@ -34,11 +34,12 @@ try {
   client = null;
 }
 
-exports.CreateUploadVideo = async function (req, res, next) {
+exports.getCreateUploadVideoAuth = async function (req, res, next) {
   console.log(req.query);
 
   if (!client) {
-    return res.status(500).json({ error: "无法连接到阿里云点播服务器" });
+    // 502  Bad Gateway  作为网关或代理的服务器，从上游服务器收到无效响应（常见于反向代理配置问题）
+    return res.status(502).json({ error: "无法连接到阿里云点播服务器" });
   }
 
   // 上传视频的信息
@@ -64,16 +65,17 @@ exports.CreateUploadVideo = async function (req, res, next) {
   } catch (error) {
     // 错误 message
     console.log(error);
-    // API返回
-    return res.status(500).json({ error: "无法从阿里云点播获得上传权限" });
+    // 502  Bad Gateway  作为网关或代理的服务器，从上游服务器收到无效响应（常见于反向代理配置问题）
+    return res.status(502).json({ error: "无法从阿里云点播获得上传权限" });
   }
 };
 
-exports.RefreshUploadVideo = async function (req, res, next) {
+exports.getRefreshUploadVideoAuth = async function (req, res, next) {
   console.log(req.query);
 
   if (!client) {
-    return res.status(500).json({ error: "无法连接到阿里云点播服务器" });
+    // 502  Bad Gateway  作为网关或代理的服务器，从上游服务器收到无效响应（常见于反向代理配置问题）
+    return res.status(502).json({ error: "无法连接到阿里云点播服务器" });
   }
 
   // 上传视频的信息
@@ -100,7 +102,7 @@ exports.RefreshUploadVideo = async function (req, res, next) {
   } catch (error) {
     // 错误 message
     console.log(error);
-    // API返回
-    return res.status(500).json({ error: "无法从阿里云点播刷新上传权限" });
+    // 502  Bad Gateway  作为网关或代理的服务器，从上游服务器收到无效响应（常见于反向代理配置问题）
+    return res.status(502).json({ error: "无法从阿里云点播刷新上传权限" });
   }
 };

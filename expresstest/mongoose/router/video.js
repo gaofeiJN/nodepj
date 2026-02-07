@@ -6,32 +6,52 @@ const { videoValidator } = require("../middleware/validator/index");
 const { videoController, vodController } = require("../controller/index");
 
 router
-  .get("/video/:id", verifyToken(false), videoController.video)
-  .get("/listAll", verifyToken(false), videoController.videoListAll)
+  .get("/:id", verifyToken(false), videoController.getVideoInfo)
+  .get("/listall", verifyToken(false), videoController.getVideoListAll)
   .get(
     "/list",
     verifyToken(false),
-    videoValidator.videoList,
-    videoController.videoList,
+    videoValidator.getVideoListValidate,
+    videoController.getVideoList,
   )
   .get(
-    "/CreateUploadVideo",
+    "/createuploadvideoauth",
     verifyToken(),
-    vodController.CreateUploadVideo,
-    videoController.CreateUploadVideo,
+    vodController.getCreateUploadVideoAuth,
+    videoController.getCreateUploadVideoAuth,
   )
   .get(
-    "/RefreshUploadVideo",
+    "/refreshuploadvideoauth",
     verifyToken(),
-    vodController.RefreshUploadVideo,
-    videoController.RefreshUploadVideo,
+    vodController.getRefreshUploadVideoAuth,
+    videoController.getRefreshUploadVideoAuth,
+  )
+  .get(
+    "/:videoId/commentlist",
+    verifyToken(false),
+    videoValidator.getCommentListValidate,
+    videoController.getCommentList,
   );
 
-router.post(
-  "/creations",
+router
+  .post(
+    "/creation",
+    verifyToken(),
+    videoValidator.postVideoCreationValidate,
+    videoController.postVideoCreation,
+  )
+  .post(
+    "/:videoId/comment",
+    verifyToken(),
+    videoValidator.postCommentValidate,
+    videoController.postComment,
+  );
+
+router.delete(
+  "/:videoId/comment/:commentId",
   verifyToken(),
-  videoValidator.createVideo,
-  videoController.createVideo,
+  videoValidator.deleteCommentValidate,
+  videoController.deleteComment,
 );
 
 module.exports = router;

@@ -28,33 +28,16 @@ exports.verifyToken = function (verificationRequired = true) {
 
         next();
       } catch (e) {
-        return res.status(402).json({ error: "无效的token" });
+        // 401  Unauthorized  请求需要身份认证（如用户名或密码缺失或错误）
+        return res.status(401).json({ error: "无效的token" });
       }
     } else {
       if (verificationRequired) {
-        return res.status(402).json({ error: "请传入token" });
+        // 401  Unauthorized  请求需要身份认证（如用户名或密码缺失或错误）
+        return res.status(401).json({ error: "请传入token" });
       } else {
         next();
       }
     }
   };
 };
-
-// var user = {
-//     name :'gao fei',
-//     age :39,
-//     city :'jinan',
-//     phone :'15662689645'
-// }
-
-// var secret = "f6f6c96b-e006-4d60-9b69-2bc4cb28cae2";
-
-// async function jwtTest(){
-//   let token = await sign(user,secret,{algorithm:'HS256'});
-//   console.log(token);
-
-//   let result = await verify(token,secret);
-//   console.log(result);
-// }
-
-// jwtTest();
