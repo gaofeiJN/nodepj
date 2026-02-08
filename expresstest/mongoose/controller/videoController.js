@@ -1,4 +1,4 @@
-const { Video, Comment } = require("../model/index");
+const { Video, Comment, Approval, Favor } = require("../model/index");
 const mongoose = require("mongoose");
 
 // 查找指定视频
@@ -7,10 +7,20 @@ exports.getVideoInfo = async (req, res) => {
   console.log(req.params);
 
   try {
-    const video = await Video.findById(req.params.id).populate(
+    const videoDoc = await Video.findById(req.params.videoId).populate(
       "userId",
       "_id name image",
     );
+    const video = videoDoc.toJSON();
+    video.isFavarite = false;
+    video.isApproval = false;
+
+    const favorite = await Favor.findOne({ videoId: video._id });
+    if (favorite) video.isFavarite = true;
+
+    const approval = await Approval.findOne({ videoId: video._id });
+    if (approval) video.isApproval = true;
+
     console.log(video);
 
     // 200  OK  请求成功完成，服务器返回了期望的响应内容（如网页或数据）
@@ -64,29 +74,20 @@ exports.getVideoList = async (req, res) => {
   }
 };
 
-// 获取VOD上传权限
-exports.getCreateUploadVideoAuth = async (req, res) => {
-  console.log("videoController -- getCreateUploadVideoAuth called");
-
-  // 200  OK  请求成功完成，服务器返回了期望的响应内容（如网页或数据）
-  res.status(200).json(req.alires);
-};
-
-// 更新VOD上传权限
-exports.getRefreshUploadVideoAuth = async (req, res) => {
-  console.log("videoController -- getRefreshUploadVideoAuth called");
-
-  // 200  OK  请求成功完成，服务器返回了期望的响应内容（如网页或数据）
-  res.status(200).json(req.alires);
-};
-
 // 创建新视频
-exports.postVideoCreation = async (req, res) => {
-  console.log("videoController -- postVideoCreation called");
-  console.log(req.body);
+exports.postVideo = async (req, res) => {
+  console.log("videoController -- postVideo called");
+  console.log(req.body.title);
+  console.log(req.file);
 
-  let newVideo = new Video(req.body);
-  newVideo.userId = req.userInfo._id;
+  let videoObj = {};
+  videoObj.title = req.body.title;
+  videoObj.fileName = req.file.filename;
+  videoObj.src = "videos/" + req.file.filename;
+  videoObj.description = req.body.description ? req.body.description : null;
+  videoObj.userId = req.userInfo._id;
+
+  let newVideo = new Video(videoObj);
   try {
     await newVideo.save();
     console.log(`Video created : ${newVideo}`);
@@ -110,7 +111,7 @@ exports.postComment = async (req, res) => {
   const userId = req.userInfo._id;
   const videoId = req.params.videoId;
   const content = req.body.content;
-  var newComment = new Comment({ content, videoId, userId });
+  let newComment = new Comment({ content, videoId, userId });
   try {
     newComment = await newComment.save();
     console.log(`Comment created : ${newComment}`);
@@ -165,7 +166,7 @@ exports.deleteComment = async (req, res) => {
     if (comment.userId.toString() !== userId) {
       console.log("不能删除别人的评论");
       // console.log(comment);
-      console.log(commentObj.userId);
+      console.log(comment.userId);
       console.log(userId);
 
       // 403：通过了token验证，服务器理解客户端的意图，但是因为没有权限而拒绝了用户的操作
@@ -189,5 +190,87 @@ exports.deleteComment = async (req, res) => {
 
     // 500  Internal Server Error  服务器内部错误（如代码缺陷）
     return res.status(500).json({ error: "Error deleting comment" });
+  }
+};
+
+// 点赞视频
+exports.getVideoApproval = async (req, res) => {
+  console.log("videoController -- getVideoApproval called");
+
+  const userId = req.userInfo._id;
+  const videoId = req.params.videoId;
+
+  try {
+    let approval = await Approval.findOne({ userId, videoId });
+    let video = await Video.findById(videoId);
+
+    // 如果已经点赞过，则删除点赞记录，同时video的点赞数量减1
+    if (approval) {
+      await approval.deleteOne();
+      video.approvalCount--;
+      await video.save();
+
+      console.log("取消点赞");
+      // 200  OK  请求成功完成，服务器返回了期望的响应内容（如网页或数据）
+      res.status(200).json({ msg: "取消点赞" });
+    }
+    // 如果没有点赞过，则新建点赞记录，同时video的点赞数量加1
+    else {
+      approval = new Approval({ videoId, userId });
+      await approval.save();
+      video.approvalCount++;
+      await video.save();
+
+      console.log("点赞成功");
+      // 201  Created  请求成功，服务器创建了新资源（通常在POST或PUT请求后返回）
+      res.status(201).json({ msg: "点赞成功" });
+    }
+  } catch (error) {
+    console.error("Error saving Approval:", error);
+
+    // 500  Internal Server Error  服务器内部错误（如代码缺陷）
+    return res.status(500).json({ error: "Error saving Approval" });
+  }
+};
+
+// 点赞视频
+exports.getVideoFavor = async (req, res) => {
+  console.log("videoController -- getVideoFavor called");
+
+  const userId = req.userInfo._id;
+  const videoId = req.params.videoId;
+  let folder = req.params.folder;
+  if (!folder) folder = "默认收藏夹";
+
+  try {
+    let favor = await Favor.findOne({ userId, videoId, folder });
+    let video = await Video.findById(videoId);
+
+    // 如果已经收藏过，则删除收藏记录，同时video的收藏数量减1
+    if (favor) {
+      await favor.deleteOne();
+      video.favorCount--;
+      await video.save();
+
+      console.log("取消收藏");
+      // 200  OK  请求成功完成，服务器返回了期望的响应内容（如网页或数据）
+      res.status(200).json({ msg: "取消收藏" });
+    }
+    // 如果没有收藏过，则新建收藏记录，同时video的收藏数量加1
+    else {
+      favor = new Favor({ videoId, userId, folder });
+      await favor.save();
+      video.favorCount++;
+      await video.save();
+
+      console.log("收藏成功");
+      // 201  Created  请求成功，服务器创建了新资源（通常在POST或PUT请求后返回）
+      res.status(201).json({ msg: "收藏成功" });
+    }
+  } catch (error) {
+    console.error("Error saving Favor:", error);
+
+    // 500  Internal Server Error  服务器内部错误（如代码缺陷）
+    return res.status(500).json({ error: "Error saving Favor" });
   }
 };

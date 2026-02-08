@@ -1,14 +1,8 @@
 const mongoose = require("mongoose");
 
 // 定义Schema
-const commentSchema = new mongoose.Schema(
+const approvalSchema = new mongoose.Schema(
   {
-    content: {
-      type: String,
-      required: [true, "评论内容不能为空"],
-      minlength: [10, "评论至少10个字符"],
-      maxlength: [256, "评论最多256个字符"],
-    },
     videoId: {
       type: mongoose.ObjectId,
       required: [true, "videoId不能为空"],
@@ -18,24 +12,6 @@ const commentSchema = new mongoose.Schema(
       type: mongoose.ObjectId,
       required: [true, "userId不能为空"],
       ref: "User",
-    },
-    approvalCount: {
-      type: Number,
-      required: false,
-      default: 0,
-    },
-    approvals: {
-      type: [mongoose.ObjectId],
-      required: false,
-    },
-    objectionCount: {
-      type: Number,
-      required: false,
-      default: 0,
-    },
-    objections: {
-      type: [mongoose.ObjectId],
-      required: false,
     },
   },
   {
@@ -85,7 +61,7 @@ const commentSchema = new mongoose.Schema(
 // 索引优化
 // ====================
 
-commentSchema.index({ videoId: 1, createdAt: -1 }); // 降序索引
+approvalSchema.index({ userId: 1, videoId: 1 });
 
 // 导出模型
-module.exports = commentSchema;
+module.exports = approvalSchema;

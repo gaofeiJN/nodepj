@@ -3,7 +3,7 @@ const validate = require("./errorBack");
 const { Video, Comment, User } = require("../../model/index");
 
 // 由valid check回调函数组成的数组
-exports.postVideoCreationValidate = validate([
+exports.postVideoValidate = validate([
   body("title")
     .notEmpty()
     .withMessage("标题不能为空")
@@ -14,32 +14,6 @@ exports.postVideoCreationValidate = validate([
     .isLength({ min: 3, max: 30 })
     .withMessage("标题长度必须在3到30个字符之间")
     .bail(),
-  body("fileName")
-    .notEmpty()
-    .withMessage("文件名不能为空")
-    .bail()
-    .isString()
-    .withMessage("文件名必须是字符串")
-    .bail(),
-  body("videoId")
-    .notEmpty()
-    .withMessage("videoId不能为空")
-    .bail()
-    .isString()
-    .withMessage("videoId必须是字符串")
-    .bail()
-    .custom(async (value) => {
-      try {
-        const existingVideo = await Video.findOne({ videoId: value });
-        if (existingVideo) {
-          throw new Error("videoId已存在");
-        }
-        return true;
-      } catch (error) {
-        console.log(error);
-        throw error;
-      }
-    }),
 ]);
 
 // 由valid check回调函数组成的数组
@@ -80,7 +54,7 @@ exports.postCommentValidate = validate([
 ]);
 
 // 由valid check回调函数组成的数组
-exports.getCommentListValidate = validate([
+exports.getCommentsValidate = validate([
   param("videoId").custom(async (videoId) => {
     try {
       const video = await Video.findById(videoId);
@@ -121,4 +95,51 @@ exports.deleteCommentValidate = validate([
       throw error;
     }
   }),
+]);
+
+// 由valid check回调函数组成的数组
+exports.getVideoApprovalsValidate = validate([
+  param("videoId").custom(async (videoId) => {
+    try {
+      const video = await Video.findById(videoId);
+      if (!video) {
+        throw new Error("视频不存在");
+      }
+      return true;
+    } catch (error) {
+      console.log(error);
+      throw error;
+    }
+  }),
+]);
+
+// 由valid check回调函数组成的数组
+exports.getVideoFavoritesValidate = validate([
+  param("videoId").custom(async (videoId) => {
+    try {
+      const video = await Video.findById(videoId);
+      if (!video) {
+        throw new Error("视频不存在");
+      }
+      return true;
+    } catch (error) {
+      console.log(error);
+      throw error;
+    }
+  }),
+  param("folder")
+    .optional()
+    .isString()
+    .withMessage("收藏夹必须是字符串")
+    .bail()
+    .isLength({ min: 1, max: 20 })
+    .withMessage("收藏夹的长度必须在1到20个字符之间")
+    .bail()
+    .custom(async (folder) => {
+      const allowedPattern = /^[\w\p{Script=Han}]{1,20}$/u;
+      if (!allowedPattern.test(folder)) {
+        throw new Error("非法的收藏夹名称");
+      }
+      return true;
+    }),
 ]);

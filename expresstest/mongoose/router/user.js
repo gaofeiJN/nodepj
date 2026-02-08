@@ -4,35 +4,7 @@ const router = express.Router();
 const { userController } = require("../controller/index");
 const { userValidator } = require("../middleware/validator/index");
 const { verifyToken } = require("../util/jwt");
-const upload = require("../util/multer");
-
-router
-  .get("/userlist", verifyToken(), userController.getUserList)
-  .get("/:userId/userinfo", userController.getUserInfo)
-  .get(
-    "/:channelId/subscribe",
-    verifyToken(),
-    userValidator.getSubscribeValidate,
-    userController.getSubscribe,
-  )
-  .get(
-    "/:channelId/unsubscribe",
-    verifyToken(),
-    userValidator.getUnsubscribeValidate,
-    userController.getUnsubscribe,
-  )
-  .get(
-    "/:userId/follow",
-    verifyToken(),
-    userValidator.getFollowValidate,
-    userController.getFollow,
-  )
-  .get(
-    "/:userId/fans",
-    verifyToken(),
-    userValidator.getFansValidate,
-    userController.getFans,
-  );
+const { uploadAvatar } = require("../util/multer");
 
 router
   .post(
@@ -40,24 +12,58 @@ router
     userValidator.postRegisterValidate,
     userController.postRegister,
   )
-  .post(
-    "/login", 
-    userValidator.postLoginValidate, 
-    userController.postLogin)
+  .post("/login", userValidator.postLoginValidate, userController.postLogin)
   .post(
     "/avatar",
     verifyToken(),
-    upload.single("avatar"),
+    uploadAvatar.single("avatar"),
     userController.postAvatar,
   );
 
 router
-  .put(
-    "/:userId/update",
+  .post(
+    "/:channelId/subscribe",
     verifyToken(),
-    userValidator.putUpdateValidate,
-    userController.putUpdate,
+    userValidator.postSubscribeValidate,
+    userController.getSubscribe,
   )
-  .delete("/:userId", userController.deleteUser);
+  .delete(
+    "/:channelId/subscribe",
+    verifyToken(),
+    userValidator.deleteSubscribeValidate,
+    userController.getUnsubscribe,
+  )
+  .get(
+    "/:userId/following",
+    verifyToken(),
+    userValidator.getFollowingValidate,
+    userController.getFollow,
+  )
+  .get(
+    "/:userId/followers",
+    verifyToken(),
+    userValidator.getFollowersValidate,
+    userController.getFans,
+  )
+  .get(
+    "/:userId/approvals",
+    verifyToken(),
+    userValidator.getApprovalsValidate,
+    userController.getApprovals,
+  )
+  .get(
+    "/:userId/favorites",
+    verifyToken(),
+    userValidator.getFavoritesValidate,
+    userController.getFavorites,
+  );
+
+// 用户更新和删除路由
+router.put(
+  "/:userId",
+  verifyToken(),
+  userValidator.putUpdateValidate,
+  userController.putUpdate,
+);
 
 module.exports = router;

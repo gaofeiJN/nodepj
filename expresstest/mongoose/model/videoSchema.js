@@ -5,9 +5,19 @@ const videoSchema = new mongoose.Schema(
   {
     title: { type: String, required: true },
     fileName: { type: String, required: true },
+    src: { type: String, required: true },
     description: { type: String, required: false },
-    videoId: { type: String, required: true, unique: true },
     userId: { type: mongoose.ObjectId, required: true, ref: "User" },
+    approvalCount: {
+      type: Number,
+      required: false,
+      default: 0,
+    },
+    favorCount: {
+      type: Number,
+      required: false,
+      default: 0,
+    },
   },
   {
     timestamps: true,

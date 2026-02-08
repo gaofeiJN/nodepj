@@ -1,4 +1,4 @@
-const { User, Subscribe } = require("../model/index");
+const { User, Subscribe, Approval, Favor } = require("../model/index");
 const { createToken } = require("../util/jwt");
 
 // 注册新用户
@@ -26,7 +26,7 @@ exports.postRegister = async (req, res) => {
 exports.postLogin = async (req, res) => {
   console.log("UserController -- postLogin called");
   const { name, phone, email, password } = req.body;
-  var user = {};
+  let user;
   console.log(name, phone, email, password);
 
   try {
@@ -76,14 +76,6 @@ exports.postLogin = async (req, res) => {
   }
 };
 
-exports.getUserList = async (req, res) => {
-  console.log("UserController -- getUserList called");
-};
-
-exports.getUserInfo = async (req, res) => {
-  console.log(`UserController -- getUserInfo called`);
-};
-
 exports.putUpdate = async (req, res) => {
   console.log(`UserController -- putUpdate called`);
 
@@ -92,28 +84,24 @@ exports.putUpdate = async (req, res) => {
       // 400  Bad Request  请求存在语法错误（如参数格式无效）
       return res.status(400).json({ error: "Missing user id" });
     }
-    let newuser = await User.findByIdAndUpdate(req.userInfo._id, req.body, {
+    let newUser = await User.findByIdAndUpdate(req.userInfo._id, req.body, {
       new: true,
       runValidators: true,
     });
-    if (!newuser) {
+    if (!newUser) {
       // 404  Not Found  请求的资源不存在（如URL错误或资源被删除）
       return res.status(404).json({ error: "User not found" });
     }
-    console.log(newuser);
+    console.log(newUser);
 
     // 200  OK  请求成功完成，服务器返回了期望的响应内容（如网页或数据）
-    res.status(200).json(newuser);
+    res.status(200).json(newUser);
   } catch (error) {
     console.log(error);
 
     // 500  Internal Server Error  服务器内部错误（如代码缺陷）
     return res.status(500).json({ error: "Error updating user" });
   }
-};
-
-exports.deleteUser = async (req, res) => {
-  console.log(`UserController -- deleteUser called`);
 };
 
 exports.postAvatar = async (req, res) => {
@@ -123,17 +111,17 @@ exports.postAvatar = async (req, res) => {
   // 更新用户的头像信息
   let avatar = "avatars/" + req.file.filename;
   try {
-    let newuser = await User.findByIdAndUpdate(
+    let newUser = await User.findByIdAndUpdate(
       req.userInfo._id,
       { image: avatar },
       { new: true },
     );
-    if (!newuser) {
+    if (!newUser) {
       // 404  Not Found  请求的资源不存在（如URL错误或资源被删除）
       return res.status(404).json({ error: "用户不存在" });
     }
 
-    let userJSON = newuser.toJSON();
+    let userJSON = newUser.toJSON();
     console.log(`用户头像更改成功 \n ${userJSON}`);
 
     // 200  OK  请求成功完成，服务器返回了期望的响应内容（如网页或数据）
@@ -149,7 +137,7 @@ exports.postAvatar = async (req, res) => {
 exports.getSubscribe = async (req, res) => {
   console.log(`UserController -- getSubscribe called`);
 
-  const userId = req.userInfo.id;
+  const userId = req.userInfo._id;
   const channelId = req.params.channelId;
 
   // 检查userId与channelId是否相等
@@ -177,8 +165,8 @@ exports.getSubscribe = async (req, res) => {
   // 订阅频道入库
   let newSubscribe = new Subscribe({ userId, channelId });
   try {
-    let dbback = await newSubscribe.save();
-    console.log(dbback);
+    let dbResult = await newSubscribe.save();
+    console.log(dbResult);
 
     let user = await User.findById(channelId);
     user.subscribeCount++;
@@ -199,7 +187,7 @@ exports.getSubscribe = async (req, res) => {
 exports.getUnsubscribe = async (req, res) => {
   console.log(`UserController -- getUnsubscribe called`);
 
-  const userId = req.userInfo.id;
+  const userId = req.userInfo._id;
   const channelId = req.params.channelId;
 
   // 检查userId与channelId是否相等
@@ -216,8 +204,8 @@ exports.getUnsubscribe = async (req, res) => {
       return res.status(403).json({ error: "不能取消未关注的频道" });
     } else {
       // 取消订阅频道入库
-      let dbback = await subscribed.deleteOne();
-      console.log(dbback);
+      let dbResult = await subscribed.deleteOne();
+      console.log(dbResult);
 
       let user = await User.findById(channelId);
       user.subscribeCount--;
@@ -267,6 +255,47 @@ exports.getFans = async (req, res) => {
 
     // 200  OK  请求成功完成，服务器返回了期望的响应内容（如网页或数据）
     res.status(200).json(fanList);
+  } catch (error) {
+    console.log(error);
+
+    // 500  Internal Server Error  服务器内部错误（如代码缺陷）
+    return res.status(500).json({ error: "访问数据库时发生错误" });
+  }
+};
+
+// 获取用户的点赞视频列表
+exports.getApprovals = async (req, res) => {
+  console.log(`UserController -- getApproval called`);
+
+  const userId = req.params.userId;
+  try {
+    const approvalList = await Approval.find({ userId }).sort({
+      createdAt: -1,
+    });
+
+    // 200  OK  请求成功完成，服务器返回了期望的响应内容（如网页或数据）
+    res.status(200).json(approvalList);
+  } catch (error) {
+    console.log(error);
+
+    // 500  Internal Server Error  服务器内部错误（如代码缺陷）
+    return res.status(500).json({ error: "访问数据库时发生错误" });
+  }
+};
+
+// 获取用户的收藏视频列表
+exports.getFavorites = async (req, res) => {
+  console.log(`UserController -- getFavor called`);
+
+  const userId = req.params.userId;
+  try {
+    const favorList = await Favor.find({ userId }).sort({
+      folder: 1,
+      createdAt: -1,
+    });
+
+    // 200  OK  请求成功完成，服务器返回了期望的响应内容（如网页或数据）
+    res.status(200).json(favorList);
   } catch (error) {
     console.log(error);
 

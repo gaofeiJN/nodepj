@@ -118,3 +118,6 @@ dist
 
 # others
 gitignore.txt
+*node_modules/
+*.mp4
+*.mov

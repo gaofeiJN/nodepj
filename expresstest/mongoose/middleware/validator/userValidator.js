@@ -212,17 +212,17 @@ exports.putUpdateValidate = validate([
 ]);
 
 // 由valid check回调函数组成的数组
-exports.getSubscribeValidate = validate([
+exports.postSubscribeValidate = validate([
   param("channelId").notEmpty().withMessage("频道id不能为空").bail(),
 ]);
 
 // 由valid check回调函数组成的数组
-exports.getUnsubscribeValidate = validate([
+exports.deleteSubscribeValidate = validate([
   param("channelId").notEmpty().withMessage("频道id不能为空").bail(),
 ]);
 
 // 由valid check回调函数组成的数组
-exports.getFollowValidate = validate([
+exports.getFollowingValidate = validate([
   param("userId")
     .notEmpty()
     .withMessage("userId不能为空")
@@ -242,7 +242,47 @@ exports.getFollowValidate = validate([
 ]);
 
 // 由valid check回调函数组成的数组
-exports.getFansValidate = validate([
+exports.getFollowersValidate = validate([
+  param("userId")
+    .notEmpty()
+    .withMessage("userId不能为空")
+    .bail()
+    .custom(async function (userId) {
+      try {
+        let user = await User.findById(userId);
+        if (!user) {
+          throw new Error("用户不存在");
+        }
+        return true;
+      } catch (error) {
+        console.log(error);
+        throw error;
+      }
+    }),
+]);
+
+// 由valid check回调函数组成的数组
+exports.getApprovalsValidate = validate([
+  param("userId")
+    .notEmpty()
+    .withMessage("userId不能为空")
+    .bail()
+    .custom(async function (userId) {
+      try {
+        let user = await User.findById(userId);
+        if (!user) {
+          throw new Error("用户不存在");
+        }
+        return true;
+      } catch (error) {
+        console.log(error);
+        throw error;
+      }
+    }),
+]);
+
+// 由valid check回调函数组成的数组
+exports.getFavoritesValidate = validate([
   param("userId")
     .notEmpty()
     .withMessage("userId不能为空")
