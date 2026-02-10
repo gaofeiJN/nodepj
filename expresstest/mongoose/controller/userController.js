@@ -137,18 +137,18 @@ exports.postAvatar = async (req, res) => {
 exports.getSubscribe = async (req, res) => {
   console.log(`UserController -- getSubscribe called`);
 
-  const userId = req.userInfo._id;
-  const channelId = req.params.channelId;
+  const user = req.userInfo._id;
+  const channel = req.params.channelId;
 
   // 检查userId与channelId是否相等
-  if (userId === channelId) {
+  if (user === channel) {
     // 403  Forbidden  服务器拒绝请求，客户端无访问权限（细分如403.1执行权限问题、403.6 IP封禁等）
     return res.status(403).json({ error: "不能关注自己" });
   }
 
   // 检查是否已关注频道
   try {
-    const subscribed = await Subscribe.findOne({ userId, channelId });
+    const subscribed = await Subscribe.findOne({ user, channel });
     if (subscribed) {
       // 403  Forbidden  服务器拒绝请求，客户端无访问权限（细分如403.1执行权限问题、403.6 IP封禁等）
       return res.status(403).json({ error: "已关注此频道" });
@@ -163,15 +163,15 @@ exports.getSubscribe = async (req, res) => {
   }
 
   // 订阅频道入库
-  let newSubscribe = new Subscribe({ userId, channelId });
+  let newSubscribe = new Subscribe({ user, channel });
   try {
     let dbResult = await newSubscribe.save();
     console.log(dbResult);
 
-    let user = await User.findById(channelId);
-    user.subscribeCount++;
-    user = await user.save();
-    console.log(user);
+    let userDoc = await User.findById(channel);
+    userDoc.subscribeCount++;
+    userDoc = await userDoc.save();
+    console.log(userDoc);
 
     // 201  Created  请求成功，服务器创建了新资源（通常在POST或PUT请求后返回）
     res.status(201).json({ msg: "订阅成功" });
@@ -187,18 +187,18 @@ exports.getSubscribe = async (req, res) => {
 exports.getUnsubscribe = async (req, res) => {
   console.log(`UserController -- getUnsubscribe called`);
 
-  const userId = req.userInfo._id;
-  const channelId = req.params.channelId;
+  const user = req.userInfo._id;
+  const channel = req.params.channelId;
 
   // 检查userId与channelId是否相等
-  if (userId === channelId) {
+  if (user === channel) {
     // 403  Forbidden  服务器拒绝请求，客户端无访问权限（细分如403.1执行权限问题、403.6 IP封禁等）
     return res.status(403).json({ error: "不能取消关注自己" });
   }
 
   // 检查是否已关注频道
   try {
-    const subscribed = await Subscribe.findOne({ userId, channelId });
+    const subscribed = await Subscribe.findOne({ user, channel });
     if (!subscribed) {
       // 403  Forbidden  服务器拒绝请求，客户端无访问权限（细分如403.1执行权限问题、403.6 IP封禁等）
       return res.status(403).json({ error: "不能取消未关注的频道" });
@@ -207,10 +207,10 @@ exports.getUnsubscribe = async (req, res) => {
       let dbResult = await subscribed.deleteOne();
       console.log(dbResult);
 
-      let user = await User.findById(channelId);
-      user.subscribeCount--;
-      user = await user.save();
-      console.log(user);
+      let userDoc = await User.findById(channel);
+      userDoc.subscribeCount--;
+      userDoc = await userDoc.save();
+      console.log(userDoc);
 
       // 200  OK  请求成功完成，服务器返回了期望的响应内容（如网页或数据）
       res.status(200).json({ msg: "取消订阅成功" });
@@ -227,9 +227,9 @@ exports.getUnsubscribe = async (req, res) => {
 exports.getFollow = async (req, res) => {
   console.log(`UserController -- getFollow called`);
 
-  const userId = req.params.userId;
+  const user = req.params.userId;
   try {
-    const followList = await Subscribe.find({ userId })
+    const followList = await Subscribe.find({ user })
       .sort({ createdAt: -1 })
       .populate("channelId", "_id name image");
 
@@ -247,11 +247,11 @@ exports.getFollow = async (req, res) => {
 exports.getFans = async (req, res) => {
   console.log(`UserController -- getFans called`);
 
-  const userId = req.params.userId;
+  const user = req.params.userId;
   try {
-    const fanList = await Subscribe.find({ channelId: userId })
+    const fanList = await Subscribe.find({ channel: user })
       .sort({ createdAt: -1 })
-      .populate("userId", "_id name image");
+      .populate("user", "_id name image");
 
     // 200  OK  请求成功完成，服务器返回了期望的响应内容（如网页或数据）
     res.status(200).json(fanList);
@@ -267,9 +267,9 @@ exports.getFans = async (req, res) => {
 exports.getApprovals = async (req, res) => {
   console.log(`UserController -- getApproval called`);
 
-  const userId = req.params.userId;
+  const user = req.params.userId;
   try {
-    const approvalList = await Approval.find({ userId }).sort({
+    const approvalList = await Approval.find({ user }).sort({
       createdAt: -1,
     });
 
@@ -287,9 +287,9 @@ exports.getApprovals = async (req, res) => {
 exports.getFavorites = async (req, res) => {
   console.log(`UserController -- getFavor called`);
 
-  const userId = req.params.userId;
+  const user = req.params.userId;
   try {
-    const favorList = await Favor.find({ userId }).sort({
+    const favorList = await Favor.find({ user }).sort({
       folder: 1,
       createdAt: -1,
     });

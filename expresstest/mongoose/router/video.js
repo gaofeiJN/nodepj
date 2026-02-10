@@ -14,7 +14,7 @@ router
     videoValidator.getVideoListValidate,
     videoController.getVideoList,
   )
-  .get("/:videoId", verifyToken(false), videoController.getVideoInfo)
+  .get("/:videoId", verifyToken(false), videoController.getVideo)
   .get(
     "/:videoId/comments",
     verifyToken(false),

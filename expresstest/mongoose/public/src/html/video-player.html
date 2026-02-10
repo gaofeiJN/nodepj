@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/png" sizes="32x32" href="../favicon-32x32.png">
+    <title>视频播放器</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .video-container {
+            background: #000;
+            max-width: 720px;
+            margin: 20px 0;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        video {
+            width: 100%;
+            height: auto;
+            display: block;
+        }
+    </style>
+</head>
+
+<body>
+    <h1 id="myVideoTitle">title</h1>
+    <p id="myVideoDescription">description</p>
+
+    <div class="video-container">
+        <!-- 原始src会被服务器替换 -->
+        <video id="myVideo" src="original-video.mp4" controls>
+            <p>您的浏览器不支持HTML5视频，请使用现代浏览器。</p>
+        </video>
+    </div>
+
+</body>
+
+</html>

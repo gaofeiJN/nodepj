@@ -17,6 +17,7 @@
     "@alicloud/tea-util": "^1.4.11",
     "@alicloud/vod20170321": "^3.11.0",
     "bcrypt": "^6.0.0",
+    "cheerio": "^1.2.0",
     "cors": "^2.8.6",
     "express": "^5.2.1",
     "express-validator": "^7.3.1",

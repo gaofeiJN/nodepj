@@ -9,12 +9,12 @@ const commentSchema = new mongoose.Schema(
       minlength: [10, "评论至少10个字符"],
       maxlength: [256, "评论最多256个字符"],
     },
-    videoId: {
+    video: {
       type: mongoose.ObjectId,
       required: [true, "videoId不能为空"],
       ref: "Video",
     },
-    userId: {
+    user: {
       type: mongoose.ObjectId,
       required: [true, "userId不能为空"],
       ref: "User",
@@ -85,7 +85,7 @@ const commentSchema = new mongoose.Schema(
 // 索引优化
 // ====================
 
-commentSchema.index({ videoId: 1, createdAt: -1 }); // 降序索引
+commentSchema.index({ video: 1, createdAt: -1 }); // 降序索引
 
 // 导出模型
 module.exports = commentSchema;

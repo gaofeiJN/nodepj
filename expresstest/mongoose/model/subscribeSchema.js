@@ -3,12 +3,12 @@ const mongoose = require("mongoose");
 // 定义Schema
 const subscribeSchema = new mongoose.Schema(
   {
-    userId: {
+    user: {
       type: mongoose.ObjectId,
       required: [true, "用户id不能为空"],
       ref: "User",
     },
-    channelId: {
+    channel: {
       type: mongoose.ObjectId,
       required: [true, "频道id不能为空"],
       ref: "User",
@@ -61,7 +61,7 @@ const subscribeSchema = new mongoose.Schema(
 // 索引优化
 // ====================
 
-subscribeSchema.index({ userId: 1, channelId: 1 }); // 升序索引
+subscribeSchema.index({ user: 1, channel: 1 }); // 升序索引
 
 // 导出模型
 module.exports = subscribeSchema;

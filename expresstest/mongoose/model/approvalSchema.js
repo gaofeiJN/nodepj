@@ -3,12 +3,12 @@ const mongoose = require("mongoose");
 // 定义Schema
 const approvalSchema = new mongoose.Schema(
   {
-    videoId: {
+    video: {
       type: mongoose.ObjectId,
       required: [true, "videoId不能为空"],
       ref: "Video",
     },
-    userId: {
+    user: {
       type: mongoose.ObjectId,
       required: [true, "userId不能为空"],
       ref: "User",
@@ -61,7 +61,7 @@ const approvalSchema = new mongoose.Schema(
 // 索引优化
 // ====================
 
-approvalSchema.index({ userId: 1, videoId: 1 });
+approvalSchema.index({ user: 1, video: 1 });
 
 // 导出模型
 module.exports = approvalSchema;

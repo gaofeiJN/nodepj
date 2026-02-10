@@ -5,9 +5,9 @@ const videoSchema = new mongoose.Schema(
   {
     title: { type: String, required: true },
     fileName: { type: String, required: true },
-    src: { type: String, required: true },
+    url: { type: String, required: true },
     description: { type: String, required: false },
-    userId: { type: mongoose.ObjectId, required: true, ref: "User" },
+    user: { type: mongoose.ObjectId, required: true, ref: "User" },
     approvalCount: {
       type: Number,
       required: false,

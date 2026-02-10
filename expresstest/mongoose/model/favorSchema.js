@@ -3,12 +3,12 @@ const mongoose = require("mongoose");
 // 定义Schema
 const favorSchema = new mongoose.Schema(
   {
-    videoId: {
+    video: {
       type: mongoose.ObjectId,
       required: [true, "videoId不能为空"],
       ref: "Video",
     },
-    userId: {
+    user: {
       type: mongoose.ObjectId,
       required: [true, "userId不能为空"],
       ref: "User",
@@ -66,7 +66,7 @@ const favorSchema = new mongoose.Schema(
 // 索引优化
 // ====================
 
-favorSchema.index({ userId: 1, folder: 1, createdAt: -1 });
+favorSchema.index({ user: 1, folder: 1, createdAt: -1 });
 
 // 导出模型
 module.exports = favorSchema;

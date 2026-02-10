@@ -1,30 +1,63 @@
 const { Video, Comment, Approval, Favor } = require("../model/index");
-const mongoose = require("mongoose");
+const path = require("path");
+const fs = require("fs");
+const cheerio = require("cheerio");
 
 // 查找指定视频
-exports.getVideoInfo = async (req, res) => {
-  console.log("videoController -- getVideoInfo called");
+exports.getVideo = async (req, res) => {
+  console.log("videoController -- getVideo called");
   console.log(req.params);
 
   try {
     const videoDoc = await Video.findById(req.params.videoId).populate(
-      "userId",
+      "user",
       "_id name image",
     );
     const video = videoDoc.toJSON();
     video.isFavarite = false;
     video.isApproval = false;
 
-    const favorite = await Favor.findOne({ videoId: video._id });
+    const favorite = await Favor.findOne({ video: video._id });
     if (favorite) video.isFavarite = true;
 
-    const approval = await Approval.findOne({ videoId: video._id });
+    const approval = await Approval.findOne({ video: video._id });
     if (approval) video.isApproval = true;
 
     console.log(video);
 
+    // 【现代WEB开发】
+    // 前后端分离开发（SPA 单页面应用）
     // 200  OK  请求成功完成，服务器返回了期望的响应内容（如网页或数据）
-    res.status(200).json(video);
+    // res.status(200).json(video);
+
+    // 【传统模式】
+    // 服务器端渲染（SSR server side render）
+    // const htmlPath = path.join(
+    //   __dirname,
+    //   "public",
+    //   "src",
+    //   "html",
+    //   "video-player.html",
+    // );
+    let htmlContent = fs.readFileSync(
+      "./public/src/html/video-player.html",
+      "utf8",
+    );
+    console.log(htmlContent);
+
+    // 加载html文档，将其解析为DOM
+    const $ = cheerio.load(htmlContent);
+
+    // 为元素对象设置属性
+    $("#myVideo").attr("src", video.url);
+    $("#myVideoTitle").text(video.title);
+    $("#myVideoDescription").text(video.description);
+
+    // 返回给客户端
+    htmlContent = $.html();
+    console.log(htmlContent);
+
+    res.status(200).send(htmlContent);
   } catch (error) {
     console.log(error);
 
@@ -61,7 +94,7 @@ exports.getVideoList = async (req, res) => {
       .skip((pageNum - 1) * pageSize)
       .limit(pageSize)
       .sort({ createdAt: -1 })
-      .populate("userId", "_id name image"); // userId作为外键进行关联查询
+      .populate("user", "_id name image"); // user作为外键进行关联查询
     console.log(videoList);
 
     // 200  OK  请求成功完成，服务器返回了期望的响应内容（如网页或数据）
@@ -83,9 +116,9 @@ exports.postVideo = async (req, res) => {
   let videoObj = {};
   videoObj.title = req.body.title;
   videoObj.fileName = req.file.filename;
-  videoObj.src = "videos/" + req.file.filename;
+  videoObj.url = "./" + req.file.filename;
   videoObj.description = req.body.description ? req.body.description : null;
-  videoObj.userId = req.userInfo._id;
+  videoObj.user = req.userInfo._id;
 
   let newVideo = new Video(videoObj);
   try {
@@ -108,10 +141,10 @@ exports.postComment = async (req, res) => {
   console.log(req.body);
   console.log(req.params);
 
-  const userId = req.userInfo._id;
-  const videoId = req.params.videoId;
+  const user = req.userInfo._id;
+  const video = req.params.videoId;
   const content = req.body.content;
-  let newComment = new Comment({ content, videoId, userId });
+  let newComment = new Comment({ content, video, user });
   try {
     newComment = await newComment.save();
     console.log(`Comment created : ${newComment}`);
@@ -131,10 +164,10 @@ exports.getCommentList = async (req, res) => {
   console.log("videoController -- getCommentList called");
   console.log(req.params);
 
-  const videoId = req.params.videoId;
+  const video = req.params.videoId;
   try {
-    const commentList = await Comment.find({ videoId }).populate(
-      "userId",
+    const commentList = await Comment.find({ video }).populate(
+      "user",
       "_id name image",
     );
     console.log(`Comment list : ${commentList}`);
@@ -154,29 +187,29 @@ exports.deleteComment = async (req, res) => {
   console.log("videoController -- deleteComment called");
   console.log(req.params);
 
-  const videoId = req.params.videoId;
+  const video = req.params.videoId;
   const commentId = req.params.commentId;
-  const userId = req.userInfo._id;
+  const user = req.userInfo._id;
   try {
     const comment = await Comment.findById(commentId);
-    // 【注意】验证token后的负载中的userId是字符串类型，不能直接和mongoose.Types.ObjectId类型的数据比较
-    // if (comment.userId !== req.userInfo._id)  ==> 类型不同，返回false
+    // 【注意】验证token后的负载中的user是字符串类型，不能直接和mongoose.Types.ObjectId类型的数据比较
+    // if (comment.user !== req.userInfo._id)  ==> 类型不同，返回false
 
     // 比较方法一：调用mongoose.Types.ObjectId的.toString()方法
-    if (comment.userId.toString() !== userId) {
+    if (comment.user.toString() !== user) {
       console.log("不能删除别人的评论");
       // console.log(comment);
-      console.log(comment.userId);
-      console.log(userId);
+      console.log(comment.user);
+      console.log(user);
 
       // 403：通过了token验证，服务器理解客户端的意图，但是因为没有权限而拒绝了用户的操作
       return res.status(403).json({ error: "不能删除别人的评论" });
     }
     // 【注意】req.params.videoId是字符串类型，不能直接和mongoose.Types.ObjectId类型的数据比较
-    // if (comment.videoId !== req.params.videoId)  ==> 类型不同，返回false
+    // if (comment.video !== req.params.videoId)  ==> 类型不同，返回false
 
     // 比较方法二：调用mongoose.Types.ObjectId的实例方法.equals()方法
-    if (!comment.videoId.equals(req.params.videoId)) {
+    if (!comment.video.equals(req.params.videoId)) {
       // 403：通过了token验证，服务器理解客户端的意图，但是因为没有权限而拒绝了用户的操作
       return res.status(403).json({ error: "不能删除其他视频的评论" });
     }
@@ -197,18 +230,18 @@ exports.deleteComment = async (req, res) => {
 exports.getVideoApproval = async (req, res) => {
   console.log("videoController -- getVideoApproval called");
 
-  const userId = req.userInfo._id;
-  const videoId = req.params.videoId;
+  const user = req.userInfo._id;
+  const video = req.params.videoId;
 
   try {
-    let approval = await Approval.findOne({ userId, videoId });
-    let video = await Video.findById(videoId);
+    let approval = await Approval.findOne({ user, video });
+    let videoDoc = await Video.findById(video);
 
     // 如果已经点赞过，则删除点赞记录，同时video的点赞数量减1
     if (approval) {
       await approval.deleteOne();
-      video.approvalCount--;
-      await video.save();
+      videoDoc.approvalCount--;
+      await videoDoc.save();
 
       console.log("取消点赞");
       // 200  OK  请求成功完成，服务器返回了期望的响应内容（如网页或数据）
@@ -216,10 +249,10 @@ exports.getVideoApproval = async (req, res) => {
     }
     // 如果没有点赞过，则新建点赞记录，同时video的点赞数量加1
     else {
-      approval = new Approval({ videoId, userId });
+      approval = new Approval({ video, user });
       await approval.save();
-      video.approvalCount++;
-      await video.save();
+      videoDoc.approvalCount++;
+      await videoDoc.save();
 
       console.log("点赞成功");
       // 201  Created  请求成功，服务器创建了新资源（通常在POST或PUT请求后返回）
@@ -237,20 +270,20 @@ exports.getVideoApproval = async (req, res) => {
 exports.getVideoFavor = async (req, res) => {
   console.log("videoController -- getVideoFavor called");
 
-  const userId = req.userInfo._id;
-  const videoId = req.params.videoId;
+  const user = req.userInfo._id;
+  const video = req.params.videoId;
   let folder = req.params.folder;
   if (!folder) folder = "默认收藏夹";
 
   try {
-    let favor = await Favor.findOne({ userId, videoId, folder });
-    let video = await Video.findById(videoId);
+    let favor = await Favor.findOne({ user, video, folder });
+    let videoDoc = await Video.findById(video);
 
     // 如果已经收藏过，则删除收藏记录，同时video的收藏数量减1
     if (favor) {
       await favor.deleteOne();
-      video.favorCount--;
-      await video.save();
+      videoDoc.favorCount--;
+      await videoDoc.save();
 
       console.log("取消收藏");
       // 200  OK  请求成功完成，服务器返回了期望的响应内容（如网页或数据）
@@ -258,10 +291,10 @@ exports.getVideoFavor = async (req, res) => {
     }
     // 如果没有收藏过，则新建收藏记录，同时video的收藏数量加1
     else {
-      favor = new Favor({ videoId, userId, folder });
+      favor = new Favor({ video, user, folder });
       await favor.save();
-      video.favorCount++;
-      await video.save();
+      videoDoc.favorCount++;
+      await videoDoc.save();
 
       console.log("收藏成功");
       // 201  Created  请求成功，服务器创建了新资源（通常在POST或PUT请求后返回）
