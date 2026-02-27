@@ -2,7 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/.idea/webstorage.iml" filepath="$PROJECT_DIR$/.idea/webstorage.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/mongoose.iml" filepath="$PROJECT_DIR$/.idea/mongoose.iml" />
     </modules>
   </component>
 </project>

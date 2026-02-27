@@ -9,8 +9,16 @@ const writeFile = util.promisify(fs.writeFile);
 
 app.get("/", async (req, res) => {
   try {
+    const data1 = { name: "gaofei", age: 39, city: "shanghai" };
+    console.log(data1);
+    const data2 = "hello world";
+    console.log(data2);
+    const data3 = [1, 2, 3, 4, 5];
+    console.log(data3);
+
     const data = await readFile("./db.json", "utf8");
     let users = JSON.parse(data).users;
+    console.log(users);
     res.send(JSON.stringify(users));
   } catch (err) {
     res.status(500).json({ err });
